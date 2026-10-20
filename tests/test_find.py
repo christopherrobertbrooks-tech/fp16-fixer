@@ -141,3 +141,23 @@ def test_ops_seen_when_the_model_runs_in_another_thread():
         t = threading.Thread(target=lambda: m(x)); t.start(); t.join()
     rows = rec.report()
     assert any(p == "layers.2.attn" and k == "op:matmul" for _, p, _, k, _ in rows), rows
+
+
+def test_dataflow_graph_links_the_swiglu_product():
+    torch.manual_seed(0)
+    rec, rows = run(Toy().eval())
+    e = rec.edges
+    mul = ("layers.1.mlp", "op:mul#0")
+    assert (("layers.1.mlp.up", "op:linear#0"), mul) in e, sorted(x for x in e if x[1] == mul)
+    assert (("layers.1.mlp", "op:silu#0"), mul) in e
+    assert (mul, ("layers.1.mlp.down", "op:linear#0")) in e
+    # the two residual adds of a block are told apart, and the second reads the first through the MLP's norm
+    assert (("layers.1", "op:add#0"), ("layers.1", "op:add#1")) in e
+    assert any(src == ("layers.1", "op:add#0") and dst[0] == "layers.1.n2" for src, dst in e)
+
+
+def test_attention_scale_is_recorded():
+    torch.manual_seed(0)
+    rec, rows = run(Toy().eval())
+    divs = {n: v for n, v in rec.node_scalars.items() if n[0] == "layers.2.attn"}
+    assert any(abs(x - 8.0) < 1e-9 for v in divs.values() for x in v), divs     # / sqrt(64)

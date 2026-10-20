@@ -1,6 +1,7 @@
 """Shared bits for the drivers: print a find report and save it as JSON."""
 import json
 from fp16fix.find import FP16_MAX, summarize
+from fp16fix.plan import Plan
 
 
 def show(rec, title, out_json, headroom=4.0, top=25, half=None):
@@ -17,6 +18,10 @@ def show(rec, title, out_json, headroom=4.0, top=25, half=None):
         bad = half.first_nonfinite()
         print(f"plain float16 run: {'first non-finite at ' + bad[0][0] + ' ' + bad[0][1] if bad else 'no inf / nan'}"
               f"{f' ({len(bad)} sites in all)' if bad else ''}")
+    plan = Plan(rec, half, headroom)
+    print("PLAN:", plan.describe(), sep="\n")
+    json.dump([{k: (v if not isinstance(v, (set, tuple)) else list(v)) for k, v in f.items() if k != "nodes"}
+               for f in plan.fixes], open(out_json.replace(".json", ".plan.json"), "w"), indent=1, default=str)
     json.dump({"title": title, "headroom": headroom,
                "flagged": [{"path": p, "module": m, "kind": k, "max": v} for _, p, m, k, v in rows],
                "all": {f"{p}|{k}": v for (p, k), v in allv.items()},

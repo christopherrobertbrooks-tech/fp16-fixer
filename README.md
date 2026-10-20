@@ -6,8 +6,8 @@ project automates the rule those fixes follow: find where the numbers leave floa
 power-of-two rescaling across a scale-free boundary (a norm, a softmax with its scale folded in), or a float32 island
 where no such boundary exists.
 
-**Status (2026-10-20): step 1, *find*, works.** Steps 2-4 (plan a fix, apply it as load-time hooks, check against
-float32) are next.
+**Status (2026-10-20): steps 1 (*find*) and 2 (*plan*) work.** Steps 3-4 (apply the plan as load-time hooks, check
+against float32) are next.
 
 ## Step 1: find (`fp16fix/find.py`)
 
@@ -39,9 +39,33 @@ Tesla V100, stock ACE-Step 1.5 code (the hand fixes switched off), the real pipe
 Plain float16 breaks first where the hand fixes say: the lyric encoder's `layers.7` (all song models), the LM's layer 2
 (1.7B) / layer 16 (4B). Reports: `results/*.report.txt`, full maxima: `results/*.json`.
 
+## Step 2: plan (`fp16fix/plan.py`)
+
+The recorder also keeps a data-flow map (which operation produced each input; plain numbers an operation multiplies
+by). The planner's one move is *shrink it where it still fits*: an over-range value is divided by a power of two at an
+earlier point that still fits, walking back through steps that are proportional in that input (a linear layer, a
+product in one factor, a sum in both, a multiply by a plain number). The rules, in order:
+
+1. **Residual stream** (adds that feed each other): if only norms read it, divide the whole stream by 2^k -- shrink
+   every writer, divide the reading norms' epsilon by 4^k. Exact. Otherwise keep the stream in float32.
+2. **Attention scores**: move the scale that follows q @ k^T onto the q side (back to `q_norm` / `q_proj`).
+3. **Product into a projection**: shrink it where it fits, multiply back in float32 after the next linear layer.
+4. Otherwise a float32 island.
+
+| model | hand fix | plan (headroom 4x) |
+| --- | --- | --- |
+| DiT, xl-sft | stream / 64 at `proj_in`, `o_proj`, `down_proj`; those norms' eps / 64^2 | stream / 128 at `proj_in`, `o_proj`, `down_proj` (or the gate product where it fits); eps / 128^2 on `self_attn_norm`, `cross_attn_norm`, `mlp_norm`, `norm_out` |
+| XL attention, layer 0 | fold 1/sqrt(128) into `q_norm` | move the x0.08839 scale onto `q_norm`: 128,143 -> 11,326 |
+| lyric encoder | last `down_proj` in float32 | stream / 32 (the hand probe's / 8 left it at ~63,000) |
+| 5 Hz LM 1.7B | float32 residual; `up` / 128, x128 after `down_proj` | stream / 128, with layer 2's massive activation shrunk at `up` |
+
+Same rules and places as the hand fixes; the factors differ only by the headroom asked for (the hand-made /64 leaves
+~3x; at headroom 3 the planner picks 64 too). Turbo's DiT (peak 23,898) and XL layer 30's attention (22,772) get
+"margin only" fixes: they fit float16 already.
+
 ## Tests
 
-`tests/test_find.py` (7): a toy model with planted sites -- a SwiGLU product, q.k scores (eager and SDPA), a residual
+`tests/test_find.py` (9) and `tests/test_plan.py` (5, the planner on toy models with known answers). `test_find.py`: a toy model with planted sites -- a SwiGLU product, q.k scores (eager and SDPA), a residual
 stream -- must be found and clean blocks must stay quiet; masks aren't overflows; hooks are removed; operations are seen
 when the model runs in another thread. Disabling the `Linear` input hooks or the function mode makes them fail.
 

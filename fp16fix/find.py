@@ -9,10 +9,17 @@ Two kinds of observer run together:
   F.scaled_dot_product_attention never materialises its scores, so for it the scores q @ k^T are computed on the side.
 
 Maxima are kept on the GPU (torch.maximum) and read once at the end, so recording costs no syncs.
+
+With graph=True (the default) it also keeps a data-flow map for the planner: every operation call is a node
+(module path, "op:<name>#<n>", n = its count of that op within one call of the module, so the two residual adds of a
+decoder layer are #0 and #1), with an edge from the node that produced each of its tensor inputs. Shape and dtype
+operations (view, transpose, to, cat, ...) pass their input's producer through. Plain numbers an operation multiplies
+or divides by are kept too (node_scalars), so an attention scale after q @ k^T can be found.
 """
 import collections
 import re
 import threading
+import weakref
 import torch
 import torch.nn.functional as F
 from torch.overrides import TorchFunctionMode
@@ -22,6 +29,18 @@ _SKIP = {"size", "dim", "shape", "numel", "dtype", "device", "is_floating_point"
          "detach", "to", "float", "half", "bfloat16", "contiguous", "view", "reshape", "transpose", "permute", "expand",
          "unsqueeze", "squeeze", "flatten", "unflatten", "__getitem__", "split", "chunk", "narrow", "clone", "type_as",
          "masked_fill", "zeros_like", "ones_like", "new_zeros", "new_ones", "repeat", "repeat_interleave", "cat", "stack"}
+
+
+def _tensors(o):
+    """Every tensor inside nested tuples / lists / dicts."""
+    if isinstance(o, torch.Tensor):
+        yield o
+    elif isinstance(o, (tuple, list)):
+        for x in o:
+            yield from _tensors(x)
+    elif isinstance(o, dict):
+        for x in o.values():
+            yield from _tensors(x)
 
 
 def _first_tensor(o):
@@ -53,6 +72,11 @@ class Recorder:
                                           # module call and closed when that call returns
         self.dtypes = {}                  # (module path, kind) -> set of dtype names it produced
         self.nonfinite = {}               # (module path, kind) -> first time a non-finite value appeared
+        self.graph = True
+        self.node_max, self.node_order, self.node_dtypes = {}, {}, {}   # node -> 0-d tensor / first seen / dtypes
+        self.edges = set()                # (producer node, consumer node)
+        self.node_scalars = {}            # node -> set of plain numbers in its arguments
+        self._prod = {}                   # id(tensor) -> (weakref, node): who produced a live tensor
 
     # ---- recording -------------------------------------------------------------------------------------------
     @property
@@ -91,6 +115,35 @@ class Recorder:
         finally:
             self._busy = False
 
+    @property
+    def _counters(self):
+        c = getattr(self._tl, "counters", None)
+        if c is None:
+            c = self._tl.counters = []
+        return c
+
+    def _producer(self, t):
+        e = self._prod.get(id(t))
+        return e[1] if e is not None and e[0]() is t else None
+
+    def _set_producer(self, t, node):
+        try:
+            self._prod[id(t)] = (weakref.ref(t), node)
+        except TypeError:
+            return
+        if len(self._prod) > 200000:                # drop entries whose tensor is gone
+            self._prod = {k: v for k, v in self._prod.items() if v[0]() is not None}
+
+    def _rec_node(self, node, t):
+        with torch.no_grad():
+            m = t.detach().abs().amax().float()
+        if node in self.node_max:
+            self.node_max[node] = torch.maximum(self.node_max[node], m)
+        else:
+            self.node_max[node] = m
+            self.node_order[node] = len(self.node_order)
+        self.node_dtypes.setdefault(node, set()).add(str(t.dtype).replace("torch.", ""))
+
     def _pre(self, path, is_linear):
         def f(mod, args, kwargs=None):
             if self.ops and self._active and getattr(self._tl, "mode", None) is None:
@@ -98,6 +151,7 @@ class Recorder:
                 self._tl.mode.__enter__()
                 self._tl.owner_depth = len(self._stack)
             self._stack.append(path)
+            self._counters.append(collections.Counter())
             if is_linear and args:
                 self._rec(path, "input", args[0])
         return f
@@ -107,6 +161,8 @@ class Recorder:
             self._rec(path, "output", _first_tensor(out))
             if self._stack and self._stack[-1] == path:
                 self._stack.pop()
+                if self._counters:
+                    self._counters.pop()
             mode = getattr(self._tl, "mode", None)
             if mode is not None and len(self._stack) == self._tl.owner_depth:
                 mode.__exit__(None, None, None)      # the call that opened this thread's mode has returned
@@ -121,9 +177,40 @@ class Recorder:
                 kwargs = kwargs or {}
                 out = func(*args, **kwargs)
                 name = getattr(func, "__name__", str(func))
-                if name in _SKIP or not rec._stack or rec._busy:
+                if not rec._stack or rec._busy:
+                    return out
+                if name in _SKIP:
+                    if rec.graph:                     # shape / dtype ops: the output comes from the input's producer
+                        src = next((rec._producer(a) for a in _tensors(args) if rec._producer(a) is not None), None)
+                        if src is not None:
+                            for o in _tensors(out):
+                                rec._set_producer(o, src)
                     return out
                 where = rec._stack[-1]
+                if rec.graph and isinstance(_first_tensor(out), torch.Tensor) and _first_tensor(out).is_floating_point():
+                    rec._busy = True
+                    try:
+                        cnt = rec._counters[-1] if rec._counters else collections.Counter()
+                        node = (where, f"op:{name}#{cnt[name]}")
+                        cnt[name] += 1
+                        for a in _tensors((args, kwargs)):
+                            src = rec._producer(a)
+                            if src is None and a.is_floating_point() and not isinstance(a, torch.nn.Parameter) and a.numel():
+                                src = ("<input>", f"into {node[0]} {node[1]}")   # a model input (or a buffer)
+                                rec._set_producer(a, src)
+                                rec._rec_node(src, a)
+                            if src is not None:
+                                rec.edges.add((src, node))
+                        nums = [x for x in list(args) + list(kwargs.values()) if isinstance(x, (int, float)) and not isinstance(x, bool)]
+                        if nums:
+                            rec.node_scalars.setdefault(node, set()).update(float(x) for x in nums)
+                        for o in _tensors(out):
+                            rec._set_producer(o, node)
+                        ft = _first_tensor(out)
+                        if ft.numel():
+                            rec._rec_node(node, ft)
+                    finally:
+                        rec._busy = False
                 if func is F.scaled_dot_product_attention:
                     q, k = args[0], args[1]
                     rec._busy = True
@@ -162,6 +249,9 @@ class Recorder:
     # ---- reporting -------------------------------------------------------------------------------------------
     def values(self):
         return {k: float(v) for k, v in self.maxima.items()}
+
+    def node_values(self):
+        return {k: float(v) for k, v in self.node_max.items()}
 
     def first_nonfinite(self):
         """Keys that produced inf / nan, in the order they first ran (the first one is where a float16 run breaks)."""
