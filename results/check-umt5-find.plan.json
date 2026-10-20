@@ -1,0 +1,235 @@
+[
+ {
+  "rule": "residual stream in float32",
+  "peak": 374201.15625,
+  "peak_at": [
+   "encoder.block.23.layer.1",
+   "op:add#0"
+  ],
+  "factor": 32,
+  "why": "a writer has no proportional path to a value that fits",
+  "readers": [
+   "encoder.block.0.layer.0.layer_norm",
+   "encoder.block.0.layer.1.layer_norm",
+   "encoder.block.1.layer.0.layer_norm",
+   "encoder.block.1.layer.1.layer_norm",
+   "encoder.block.10.layer.0.layer_norm",
+   "encoder.block.10.layer.1.layer_norm",
+   "encoder.block.11.layer.0.layer_norm",
+   "encoder.block.11.layer.1.layer_norm",
+   "encoder.block.12.layer.0.layer_norm",
+   "encoder.block.12.layer.1.layer_norm",
+   "encoder.block.13.layer.0.layer_norm",
+   "encoder.block.13.layer.1.layer_norm",
+   "encoder.block.14.layer.0.layer_norm",
+   "encoder.block.14.layer.1.layer_norm",
+   "encoder.block.15.layer.0.layer_norm",
+   "encoder.block.15.layer.1.layer_norm",
+   "encoder.block.16.layer.0.layer_norm",
+   "encoder.block.16.layer.1.layer_norm",
+   "encoder.block.17.layer.0.layer_norm",
+   "encoder.block.17.layer.1.layer_norm",
+   "encoder.block.18.layer.0.layer_norm",
+   "encoder.block.18.layer.1.layer_norm",
+   "encoder.block.19.layer.0.layer_norm",
+   "encoder.block.19.layer.1.layer_norm",
+   "encoder.block.2.layer.0.layer_norm",
+   "encoder.block.2.layer.1.layer_norm",
+   "encoder.block.20.layer.0.layer_norm",
+   "encoder.block.20.layer.1.layer_norm",
+   "encoder.block.21.layer.0.layer_norm",
+   "encoder.block.21.layer.1.layer_norm",
+   "encoder.block.22.layer.0.layer_norm",
+   "encoder.block.22.layer.1.layer_norm",
+   "encoder.block.23.layer.0.layer_norm",
+   "encoder.block.23.layer.1.layer_norm",
+   "encoder.block.3.layer.0.layer_norm",
+   "encoder.block.3.layer.1.layer_norm",
+   "encoder.block.4.layer.0.layer_norm",
+   "encoder.block.4.layer.1.layer_norm",
+   "encoder.block.5.layer.0.layer_norm",
+   "encoder.block.5.layer.1.layer_norm",
+   "encoder.block.6.layer.0.layer_norm",
+   "encoder.block.6.layer.1.layer_norm",
+   "encoder.block.7.layer.0.layer_norm",
+   "encoder.block.7.layer.1.layer_norm",
+   "encoder.block.8.layer.0.layer_norm",
+   "encoder.block.8.layer.1.layer_norm",
+   "encoder.block.9.layer.0.layer_norm",
+   "encoder.block.9.layer.1.layer_norm",
+   "encoder.final_layer_norm"
+  ],
+  "readers_keep_float32": [],
+  "first_value": []
+ },
+ {
+  "rule": "float32 island",
+  "module": "encoder.block.18.layer.1.DenseReluDense.act",
+  "peak": 61221.046875,
+  "site": [
+   "encoder.block.18.layer.1.DenseReluDense.act",
+   "op:pow#0"
+  ],
+  "why": "no proportional path back to a value that fits"
+ },
+ {
+  "rule": "float32 island",
+  "module": "encoder.block.18.layer.1.DenseReluDense.wo",
+  "peak": 96145.6796875,
+  "site": [
+   "encoder.block.18.layer.1.DenseReluDense.wo",
+   "op:linear#0"
+  ],
+  "why": "no proportional path back to a value that fits"
+ },
+ {
+  "rule": "float32 island",
+  "module": "encoder.block.18.layer.1.dropout",
+  "peak": 96145.6796875,
+  "site": [
+   "encoder.block.18.layer.1.dropout",
+   "op:dropout#0"
+  ],
+  "why": "no proportional path back to a value that fits"
+ },
+ {
+  "rule": "float32 island",
+  "module": "encoder.block.19.layer.1.DenseReluDense.act",
+  "peak": 250102.1875,
+  "site": [
+   "encoder.block.19.layer.1.DenseReluDense.act",
+   "op:pow#0"
+  ],
+  "why": "no proportional path back to a value that fits"
+ },
+ {
+  "rule": "float32 island",
+  "module": "encoder.block.19.layer.1.DenseReluDense.wo",
+  "peak": 200364.828125,
+  "site": [
+   "encoder.block.19.layer.1.DenseReluDense.wo",
+   "op:linear#0"
+  ],
+  "why": "no proportional path back to a value that fits"
+ },
+ {
+  "rule": "float32 island",
+  "module": "encoder.block.19.layer.1.dropout",
+  "peak": 200364.828125,
+  "site": [
+   "encoder.block.19.layer.1.dropout",
+   "op:dropout#0"
+  ],
+  "why": "no proportional path back to a value that fits"
+ },
+ {
+  "rule": "float32 island",
+  "module": "encoder.block.20.layer.1.DenseReluDense.act",
+  "peak": 36365.1328125,
+  "site": [
+   "encoder.block.20.layer.1.DenseReluDense.act",
+   "op:pow#0"
+  ],
+  "why": "no proportional path back to a value that fits"
+ },
+ {
+  "rule": "float32 island",
+  "module": "encoder.block.20.layer.1.DenseReluDense.wo",
+  "peak": 118582.375,
+  "site": [
+   "encoder.block.20.layer.1.DenseReluDense.wo",
+   "op:linear#0"
+  ],
+  "why": "no proportional path back to a value that fits"
+ },
+ {
+  "rule": "float32 island",
+  "module": "encoder.block.20.layer.1.dropout",
+  "peak": 118582.375,
+  "site": [
+   "encoder.block.20.layer.1.dropout",
+   "op:dropout#0"
+  ],
+  "why": "no proportional path back to a value that fits"
+ },
+ {
+  "rule": "float32 island",
+  "module": "encoder.block.21.layer.1.DenseReluDense.wo",
+  "peak": 22741.333984375,
+  "site": [
+   "encoder.block.21.layer.1.DenseReluDense.wo",
+   "op:linear#0"
+  ],
+  "why": "no proportional path back to a value that fits"
+ },
+ {
+  "rule": "float32 island",
+  "module": "encoder.block.21.layer.1.dropout",
+  "peak": 22741.333984375,
+  "site": [
+   "encoder.block.21.layer.1.dropout",
+   "op:dropout#0"
+  ],
+  "why": "no proportional path back to a value that fits"
+ },
+ {
+  "rule": "float32 island",
+  "module": "encoder.block.22.layer.1.DenseReluDense.act",
+  "peak": 176713.484375,
+  "site": [
+   "encoder.block.22.layer.1.DenseReluDense.act",
+   "op:pow#0"
+  ],
+  "why": "no proportional path back to a value that fits"
+ },
+ {
+  "rule": "float32 island",
+  "module": "encoder.block.22.layer.1.DenseReluDense.wo",
+  "peak": 77808.609375,
+  "site": [
+   "encoder.block.22.layer.1.DenseReluDense.wo",
+   "op:linear#0"
+  ],
+  "why": "no proportional path back to a value that fits"
+ },
+ {
+  "rule": "float32 island",
+  "module": "encoder.block.22.layer.1.dropout",
+  "peak": 77808.609375,
+  "site": [
+   "encoder.block.22.layer.1.dropout",
+   "op:dropout#0"
+  ],
+  "why": "no proportional path back to a value that fits"
+ },
+ {
+  "rule": "float32 island",
+  "module": "encoder.block.23.layer.1.DenseReluDense.act",
+  "peak": 16627.63671875,
+  "site": [
+   "encoder.block.23.layer.1.DenseReluDense.act",
+   "op:pow#0"
+  ],
+  "why": "no proportional path back to a value that fits"
+ },
+ {
+  "rule": "float32 island",
+  "module": "encoder.block.23.layer.1.DenseReluDense.wo",
+  "peak": 35766.75,
+  "site": [
+   "encoder.block.23.layer.1.DenseReluDense.wo",
+   "op:linear#0"
+  ],
+  "why": "no proportional path back to a value that fits"
+ },
+ {
+  "rule": "float32 island",
+  "module": "encoder.block.23.layer.1.dropout",
+  "peak": 35766.75,
+  "site": [
+   "encoder.block.23.layer.1.dropout",
+   "op:dropout#0"
+  ],
+  "why": "no proportional path back to a value that fits"
+ }
+]

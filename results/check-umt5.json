@@ -1,0 +1,112 @@
+{
+ "plan": "28 operations above 16,376 that run in float16 -> 18 fix(es) (\"margin only\" = the peak fits float16 already; the fix only buys the requested headroom)\n- residual stream (48 adds, peak 374,201): keep in float32 (a writer has no proportional path to a value that fits)\n  [margin only]\n- float32 island: encoder.block.18.layer.1.DenseReluDense.act (peak 61,221; no proportional path back to a value that fits)\n- float32 island: encoder.block.18.layer.1.DenseReluDense.wo (peak 96,146; no proportional path back to a value that fits)\n- float32 island: encoder.block.18.layer.1.dropout (peak 96,146; no proportional path back to a value that fits)\n- float32 island: encoder.block.19.layer.1.DenseReluDense.act (peak 250,102; no proportional path back to a value that fits)\n- float32 island: encoder.block.19.layer.1.DenseReluDense.wo (peak 200,365; no proportional path back to a value that fits)\n- float32 island: encoder.block.19.layer.1.dropout (peak 200,365; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.20.layer.1.DenseReluDense.act (peak 36,365; no proportional path back to a value that fits)\n- float32 island: encoder.block.20.layer.1.DenseReluDense.wo (peak 118,582; no proportional path back to a value that fits)\n- float32 island: encoder.block.20.layer.1.dropout (peak 118,582; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.21.layer.1.DenseReluDense.wo (peak 22,741; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.21.layer.1.dropout (peak 22,741; no proportional path back to a value that fits)\n- float32 island: encoder.block.22.layer.1.DenseReluDense.act (peak 176,713; no proportional path back to a value that fits)\n- float32 island: encoder.block.22.layer.1.DenseReluDense.wo (peak 77,809; no proportional path back to a value that fits)\n- float32 island: encoder.block.22.layer.1.dropout (peak 77,809; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.23.layer.1.DenseReluDense.act (peak 16,628; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.23.layer.1.DenseReluDense.wo (peak 35,767; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.23.layer.1.dropout (peak 35,767; no proportional path back to a value that fits)",
+ "rows": [
+  {
+   "prompt": "A small orange robot walks through a rai",
+   "tokens": 26,
+   "stock_fp16": {
+    "finite": true,
+    "rel_err": 0.6085099577903748,
+    "cos": 0.8186954259872437
+   },
+   "plan_fp16": {
+    "finite": true,
+    "rel_err": 0.002882749307900667,
+    "cos": 0.9999977350234985
+   }
+  },
+  {
+   "prompt": "A golden retriever runs along a beach at",
+   "tokens": 24,
+   "stock_fp16": {
+    "finite": true,
+    "rel_err": 0.7811213135719299,
+    "cos": 0.7024592757225037
+   },
+   "plan_fp16": {
+    "finite": true,
+    "rel_err": 0.0035716586280614138,
+    "cos": 0.9999947547912598
+   }
+  },
+  {
+   "prompt": "Close-up of hands kneading bread dough o",
+   "tokens": 25,
+   "stock_fp16": {
+    "finite": true,
+    "rel_err": 0.7579565644264221,
+    "cos": 0.7319795489311218
+   },
+   "plan_fp16": {
+    "finite": true,
+    "rel_err": 0.003712833160534501,
+    "cos": 0.9999945759773254
+   }
+  },
+  {
+   "prompt": "An astronaut floats inside a space stati",
+   "tokens": 20,
+   "stock_fp16": {
+    "finite": true,
+    "rel_err": 0.039527855813503265,
+    "cos": 0.9992188215255737
+   },
+   "plan_fp16": {
+    "finite": true,
+    "rel_err": 0.00280348164960742,
+    "cos": 0.9999955892562866
+   }
+  },
+  {
+   "prompt": "Time-lapse of clouds rolling over snowy ",
+   "tokens": 21,
+   "stock_fp16": {
+    "finite": true,
+    "rel_err": 0.4759984612464905,
+    "cos": 0.8923550248146057
+   },
+   "plan_fp16": {
+    "finite": true,
+    "rel_err": 0.0016075954772531986,
+    "cos": 0.9999991655349731
+   }
+  },
+  {
+   "prompt": "\u4e00\u53ea\u718a\u732b\u5728\u7af9\u6797\u91cc\u5403\u7af9\u5b50\uff0c\u9633\u5149\u900f\u8fc7\u6811\u53f6\uff0c\u9ad8\u6e05\uff0c\u81ea\u7136\u7eaa\u5f55\u7247\u98ce\u683c\u3002",
+   "tokens": 31,
+   "stock_fp16": {
+    "finite": true,
+    "rel_err": 0.07381878048181534,
+    "cos": 0.9972715377807617
+   },
+   "plan_fp16": {
+    "finite": true,
+    "rel_err": 0.0020834142342209816,
+    "cos": 0.9999987483024597
+   }
+  },
+  {
+   "prompt": "\u8272\u8c03\u8273\u4e3d\uff0c\u8fc7\u66dd\uff0c\u9759\u6001\uff0c\u7ec6\u8282\u6a21\u7cca\u4e0d\u6e05\uff0c\u5b57\u5e55\uff0c\u98ce\u683c\uff0c\u4f5c\u54c1\uff0c\u753b\u4f5c\uff0c\u753b\u9762\uff0c\u9759\u6b62\uff0c\u6574\u4f53\u53d1\u7070",
+   "tokens": 126,
+   "stock_fp16": {
+    "finite": true,
+    "rel_err": 0.7710446119308472,
+    "cos": 0.6911450028419495
+   },
+   "plan_fp16": {
+    "finite": true,
+    "rel_err": 0.001865814090706408,
+    "cos": 1.0000112056732178
+   }
+  }
+ ],
+ "time_s": {
+  "fp32": 3.2852872212727866,
+  "fp16_plan": 1.1451644897460938,
+  "fp16_stock": 1.0151100953420003
+ },
+ "peak_gb": {
+  "fp32": 21.420988082885742,
+  "fp16_plan": 10.871829986572266
+ }
+}

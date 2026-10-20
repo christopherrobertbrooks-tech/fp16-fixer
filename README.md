@@ -7,8 +7,8 @@ power-of-two rescaling across a scale-free boundary (a norm, a softmax with its 
 where no such boundary exists.
 
 **Status (2026-10-20): all four steps work on ACE-Step 1.5 and its 5 Hz LMs** -- find, plan, apply as run-time hooks,
-check against float32 -- including a model nobody had fixed by hand (the 4B LM). Not yet tried on models outside
-ACE-Step.
+check against float32 -- including a model nobody had fixed by hand (the 4B LM), **and on two models outside
+ACE-Step: Wan 2.2's umT5-XXL text encoder and Gemma 3 4B.**
 
 ## Step 1: find (`fp16fix/find.py`)
 
@@ -90,14 +90,51 @@ song comparisons was invalid: ACE-Step's `GenerationConfig` defaults to `use_ran
 fixes alike (rounding grows through the sampler); the first step and the log-mel correlation say the two are equally
 close to float32.
 
-Limits: tried on one model family (ACE-Step 1.5 + its Qwen3-based LMs); the hooks run every operation through a
+## An unseen model: Wan 2.2's umT5-XXL text encoder (`drivers/check_umt5.py`)
+
+Studio-style encoding (padded to 512), 6 video prompts + Wan's default negative prompt, V100. In float16 transformers
+clamps over-range values to +-65,504, so plain float16 doesn't NaN -- it silently clips.
+
+| | rel. error vs float32 | cosine | 7 prompts | peak memory |
+| --- | ---: | ---: | ---: | ---: |
+| float32 | -- | -- | 3.29 s | 21.4 GB |
+| plain float16 (clamped) | 4% - 78% | 0.69 - 0.999 | 1.02 s | -- |
+| **float16 + fp16fix plan** | **0.16% - 0.37%** | **1.0000** | **1.15 s** | **10.9 GB** |
+
+The plan: the residual stream (peak 374,201) stays in float32, because its feed-forward writers can't be shrunk in
+time -- the gated-GELU's input reaches 250,000 in blocks 18-23, and nothing proportional sits between it and an
+earlier value that fits -- and those blocks' `act` / `wo` run as float32 islands. Everything else (attention, the other
+feed-forwards, all the norms) stays float16. This is the shape of the hand-made MiniMax H3 fix (float32 stream,
+float16 matmuls), reached here by the rules.
+
+## Gemma 3 4B-it (`drivers/check_gemma.py`)
+
+Gemma 3 is known to fail in float16: its embeddings are multiplied by sqrt(hidden_size) and its post-norm weights are
+large ([transformers RFC #37226](https://github.com/huggingface/transformers/pull/37226) scaled the embedding and the
+`post_*_layernorm` weights down by about sqrt(hidden_size); the pre-norms and the final norm make that exact).
+
+fp16fix's plan, from the measurements alone: **one fix -- the residual stream / 32, shrunk at the embedding's
+sqrt(hidden) multiply and at every `post_attention_layernorm` / `post_feedforward_layernorm` output, the pre-norms'
+epsilon / 1024.** The RFC's fix, with a power-of-two factor (peak 299,939 needs / 32 for 4x headroom).
+
+| 5 prompts x 48 greedy tokens, teacher-forced | plain float16 | float16 + plan |
+| --- | --- | --- |
+| top-1 agreement with float32 | NaN on all 5 | **100% on all 5** |
+| logits relative error | -- | 0.14% - 0.17% |
+| 5 passes, V100 (float32: 0.36 s) | -- | 0.22 s |
+
+Weights: Unsloth's ungated copy (`unsloth/gemma-3-4b-it`, the Gemma licence applies), text only.
+
+Not tried: MiniMax H3 itself (its smallest 16-bit setup is ~95 GB of weights, beyond a 32 GB V100 with 16 GB of RAM).
+
+Limits: tried on three model families (ACE-Step 1.5 + its Qwen3-based LMs, umT5, Gemma 3); the hooks run every operation through a
 Python `TorchFunctionMode` (no measurable cost on these diffusion runs; not yet measured on token-by-token LLM
 decoding); a plan is made per model from one calibration set (the 8 example songs, 3 prompts).
 
 ## Tests
 
 `tests/test_find.py` (9), `tests/test_plan.py` (5, the planner on toy models with known answers) and
-`tests/test_apply.py` (3: plain float16 gives NaN, float16 with the plan is finite and within 2% of float32, hooks and
+`tests/test_apply.py` (4: plain float16 gives NaN, float16 with the plan is finite and within 2% of float32, hooks and
 epsilons restored). `test_find.py`: a toy model with planted sites -- a SwiGLU product, q.k scores (eager and SDPA), a residual
 stream -- must be found and clean blocks must stay quiet; masks aren't overflows; hooks are removed; operations are seen
 when the model runs in another thread. Disabling the `Linear` input hooks or the function mode makes them fail.

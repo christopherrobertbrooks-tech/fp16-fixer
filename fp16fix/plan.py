@@ -49,6 +49,7 @@ class Plan:
         self.lim = FP16_MAX / headroom
         self.headroom = headroom
         self.val = rec32.node_values()
+        self.modout = {k[0]: v for k, v in rec32.values().items() if k[1] == "output"}   # module path -> output peak
         self.order = rec32.node_order
         self.mtype = rec32.mtype
         self.scalars = rec32.node_scalars
@@ -166,7 +167,7 @@ class Plan:
         if non_norm:
             fix.update(rule="residual stream in float32", why=f"read by non-norm modules: {non_norm[:4]}",
                        readers=sorted({r[0] for r in readers}),
-                       readers_keep_float32=sorted({r[0] for r in readers if self.v(r) > FP16_MAX}),
+                       readers_keep_float32=sorted({r[0] for r in readers if self.modout.get(r[0], 0.0) > FP16_MAX}),
                        first_value=sorted(w for w in writers if len(self.succs.get(w, ())) > 1 and self.v(w) > self.lim))
             for c in list(comp) + [w for w in writers if len(self.succs.get(w, ())) > 1]:   # + its first value
                 self.covered[c] = fix
@@ -182,7 +183,10 @@ class Plan:
         if externals:
             places += [("input", c) for c in externals]
         if not ok:
-            fix.update(rule="residual stream in float32", why="a writer has no proportional path to a value that fits")
+            fix.update(rule="residual stream in float32", why="a writer has no proportional path to a value that fits",
+                       readers=sorted({r[0] for r in readers}),
+                       readers_keep_float32=sorted({r[0] for r in readers if self.modout.get(r[0], 0.0) > FP16_MAX}),
+                       first_value=sorted(w for w in writers if len(self.succs.get(w, ())) > 1 and self.v(w) > self.lim))
         else:
             fix["shrink_at"] = sorted(set(places), key=lambda p: self.order.get(p[1], 0))
             fix["norms_eps_divide_by"] = factor * factor

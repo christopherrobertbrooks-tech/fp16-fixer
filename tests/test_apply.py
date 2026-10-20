@@ -46,3 +46,12 @@ def test_float32_stream_fallback():
     stock, fixed, again, rel, plan, _ = check(Direct().eval())
     assert torch.isfinite(fixed).all(), plan.describe()
     assert rel < 2e-2, (rel, plan.describe())
+
+
+
+def test_float32_stream_readers_judged_by_module_output():
+    """A norm reading a float32 stream squares it inside (huge) but outputs normalised values: it must hand back
+    float16, or the next float16 layer gets a float32 input."""
+    stock, fixed, again, rel, plan, _ = check(Direct().eval())
+    f = [x for x in plan.fixes if x["rule"] == "residual stream in float32"][0]
+    assert not any(m.endswith((".n1", ".n2")) for m in f["readers_keep_float32"]), f["readers_keep_float32"]

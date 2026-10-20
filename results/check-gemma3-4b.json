@@ -1,0 +1,64 @@
+{
+ "plan": "63 operations above 16,376 that run in float16 -> 1 fix(es) (\"margin only\" = the peak fits float16 already; the fix only buys the requested headroom)\n- residual stream (68 adds, peak 299,939 at model.language_model.layers.31): divide by 32 -> shrink at: output of model.language_model.embed_tokens (mul, 1x); output of model.language_model.layers.N.post_attention_layernorm (mul, 34x); output of model.language_model.layers.N.post_feedforward_layernorm (mul, 34x); norms' eps / 1024: model.language_model.layers.N.input_layernorm, model.language_model.layers.N.pre_feedforward_layernorm, model.language_model.norm",
+ "rows": [
+  {
+   "prompt": "Explain in three sentences why the sky is blue.",
+   "stock": {
+    "finite": false
+   },
+   "plan": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0014716562582179904
+   }
+  },
+  {
+   "prompt": "Write a short Python function that checks whether a string is a palindrome.",
+   "stock": {
+    "finite": false
+   },
+   "plan": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0017131086206063628
+   }
+  },
+  {
+   "prompt": "What are the main causes of the French Revolution? Answer briefly.",
+   "stock": {
+    "finite": false
+   },
+   "plan": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0015591807896271348
+   }
+  },
+  {
+   "prompt": "Translate into French: The train leaves at seven in the morning.",
+   "stock": {
+    "finite": false
+   },
+   "plan": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0013557802885770798
+   }
+  },
+  {
+   "prompt": "Give me a haiku about an old lighthouse.",
+   "stock": {
+    "finite": false
+   },
+   "plan": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0013613022165372968
+   }
+  }
+ ],
+ "time_s": {
+  "fp32": 0.36470746994018555,
+  "fp16_plan": 0.21763396263122559
+ }
+}

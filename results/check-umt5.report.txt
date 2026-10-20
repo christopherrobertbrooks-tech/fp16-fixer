@@ -1,0 +1,13 @@
+STREAM FIX: residual stream in float32 | readers: ['encoder.block.0.layer.0.layer_norm', 'encoder.block.0.layer.1.layer_norm', 'encoder.block.1.layer.0.layer_norm', 'encoder.block.1.layer.1.layer_norm', 'encoder.block.10.layer.0.layer_norm', 'encoder.block.10.layer.1.layer_norm', 'encoder.block.11.layer.0.layer_norm', 'encoder.block.11.layer.1.layer_norm', 'encoder.block.12.layer.0.layer_norm', 'e
+=== umT5-XXL (Wan 2.2) text encoder: 63 tensors above 16,376 (FP16 max / 4); largest anywhere (masks aside) 140,026,511,360
+plain float16 run: first non-finite at encoder.block.0.layer.0.SelfAttention op:div (180 sites in all)
+PLAN:
+28 operations above 16,376 that run in float16 -> 18 fix(es) ("margin only" = the peak fits float16 already; the fix only buys the requested headroom)
+A small orange robot walks through ( 26 tok) | plain float16 (clamped): rel. error 6.09e-01, cosine 0.81870 | with plan: rel. error 2.88e-03, cosine 1.00000
+A golden retriever runs along a be ( 24 tok) | plain float16 (clamped): rel. error 7.81e-01, cosine 0.70246 | with plan: rel. error 3.57e-03, cosine 0.99999
+Close-up of hands kneading bread d ( 25 tok) | plain float16 (clamped): rel. error 7.58e-01, cosine 0.73198 | with plan: rel. error 3.71e-03, cosine 0.99999
+An astronaut floats inside a space ( 20 tok) | plain float16 (clamped): rel. error 3.95e-02, cosine 0.99922 | with plan: rel. error 2.80e-03, cosine 1.00000
+Time-lapse of clouds rolling over  ( 21 tok) | plain float16 (clamped): rel. error 4.76e-01, cosine 0.89236 | with plan: rel. error 1.61e-03, cosine 1.00000
+一只熊猫在竹林里吃竹子，阳光透过树叶，高清，自然纪录片风格。     ( 31 tok) | plain float16 (clamped): rel. error 7.38e-02, cosine 0.99727 | with plan: rel. error 2.08e-03, cosine 1.00000
+色调艳丽，过曝，静态，细节模糊不清，字幕，风格，作品，画作，画面，静 (126 tok) | plain float16 (clamped): rel. error 7.71e-01, cosine 0.69115 | with plan: rel. error 1.87e-03, cosine 1.00001
+7 prompts: float32 3.285 s, 21.4 GB peak | float16 + plan 1.145 s, 10.9 GB peak | plain float16 1.015 s
