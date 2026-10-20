@@ -1,0 +1,208 @@
+{
+ "transformers": "5.18.0",
+ "torch": "2.8.0+cu126",
+ "calibration_prompts": 30,
+ "held_out": [
+  {
+   "prompt": "A polar bear and her cub walk across sea ice under a pink arctic sky, breath visible in the cold air.",
+   "tokens": 27,
+   "plain_fp16": {
+    "finite": true,
+    "rel_err": 0.5758628845214844,
+    "cos": 0.8395527005195618
+   },
+   "plan_fp16": {
+    "finite": true,
+    "rel_err": 0.0010829175589606166,
+    "cos": 1.0000022649765015
+   }
+  },
+  {
+   "prompt": "Close-up of rain drops hitting a puddle, each splash in slow motion, city lights blurred behind.",
+   "tokens": 27,
+   "plain_fp16": {
+    "finite": true,
+    "rel_err": 0.03743567690253258,
+    "cos": 0.9993016123771667
+   },
+   "plan_fp16": {
+    "finite": true,
+    "rel_err": 0.01024835929274559,
+    "cos": 0.9999490976333618
+   }
+  },
+  {
+   "prompt": "A skateboarder does a kickflip at sunset in an empty parking lot, long shadows, slow motion replay.",
+   "tokens": 26,
+   "plain_fp16": {
+    "finite": true,
+    "rel_err": 0.04501565173268318,
+    "cos": 0.998988687992096
+   },
+   "plan_fp16": {
+    "finite": true,
+    "rel_err": 0.0024534447584301233,
+    "cos": 0.9999973177909851
+   }
+  },
+  {
+   "prompt": "古老的城墙上，灯笼在夜风中轻轻摇晃，远处烟花绽放，喜庆的节日气氛。",
+   "tokens": 34,
+   "plain_fp16": {
+    "finite": true,
+    "rel_err": 0.38618090748786926,
+    "cos": 0.9271489977836609
+   },
+   "plan_fp16": {
+    "finite": true,
+    "rel_err": 0.00196295534260571,
+    "cos": 1.0000022649765015
+   }
+  },
+  {
+   "prompt": "Morning fog lifts over a vineyard in Tuscany, rows of grapevines, a farmhouse on the hill, birds take off.",
+   "tokens": 31,
+   "plain_fp16": {
+    "finite": true,
+    "rel_err": 0.5522041320800781,
+    "cos": 0.8549802303314209
+   },
+   "plan_fp16": {
+    "finite": true,
+    "rel_err": 0.001483448315411806,
+    "cos": 1.0000016689300537
+   }
+  },
+  {
+   "prompt": "A blacksmith hammers a glowing piece of steel on an anvil, sparks fly, dark workshop lit by the forge.",
+   "tokens": 29,
+   "plain_fp16": {
+    "finite": true,
+    "rel_err": 0.8337023854255676,
+    "cos": 0.6691440343856812
+   },
+   "plan_fp16": {
+    "finite": true,
+    "rel_err": 0.001636090106330812,
+    "cos": 0.9999992847442627
+   }
+  },
+  {
+   "prompt": "Top-down shot of a barista pouring latte art, a perfect rosetta forming in the cup.",
+   "tokens": 23,
+   "plain_fp16": {
+    "finite": true,
+    "rel_err": 0.6534558534622192,
+    "cos": 0.8138064742088318
+   },
+   "plan_fp16": {
+    "finite": true,
+    "rel_err": 0.0018905006581917405,
+    "cos": 0.9999999403953552
+   }
+  },
+  {
+   "prompt": "Northern lights dance over a frozen lake in Norway, green and purple ribbons reflected on the ice, a lone cabin with warm windows.",
+   "tokens": 32,
+   "plain_fp16": {
+    "finite": true,
+    "rel_err": 0.8808041214942932,
+    "cos": 0.6344295740127563
+   },
+   "plan_fp16": {
+    "finite": true,
+    "rel_err": 0.0023182169534265995,
+    "cos": 0.9999989867210388
+   }
+  },
+  {
+   "prompt": "Une vieille horloge de gare, les aiguilles tournent rapidement, des voyageurs passent en accéléré autour d'elle.",
+   "tokens": 27,
+   "plain_fp16": {
+    "finite": true,
+    "rel_err": 0.8145434856414795,
+    "cos": 0.7297762632369995
+   },
+   "plan_fp16": {
+    "finite": true,
+    "rel_err": 0.0021916937548667192,
+    "cos": 0.9999986290931702
+   }
+  },
+  {
+   "prompt": "A giant tortoise slowly eats a hibiscus flower on a tropical island, extreme close-up, natural documentary narration feel.",
+   "tokens": 29,
+   "plain_fp16": {
+    "finite": true,
+    "rel_err": 0.6120865941047668,
+    "cos": 0.8205796480178833
+   },
+   "plan_fp16": {
+    "finite": true,
+    "rel_err": 0.009456170722842216,
+    "cos": 0.999956488609314
+   }
+  },
+  {
+   "prompt": "Fireflies light up a summer meadow at dusk while a girl in a white dress runs through the tall grass, dreamy, soft focus, magical realism, warm and nostalgic colour grading, gentle handheld camera following her.",
+   "tokens": 50,
+   "plain_fp16": {
+    "finite": true,
+    "rel_err": 0.5945543050765991,
+    "cos": 0.8267543911933899
+   },
+   "plan_fp16": {
+    "finite": true,
+    "rel_err": 0.0014470197493210435,
+    "cos": 1.0000016689300537
+   }
+  },
+  {
+   "prompt": "worst quality, low quality, blurry, static, watermark, text, jpeg artifacts, deformed hands, extra fingers",
+   "tokens": 28,
+   "plain_fp16": {
+    "finite": true,
+    "rel_err": 0.8344943523406982,
+    "cos": 0.6727672815322876
+   },
+   "plan_fp16": {
+    "finite": true,
+    "rel_err": 0.0016263289144262671,
+    "cos": 0.9999991059303284
+   }
+  }
+ ],
+ "held_out_summary": {
+  "plain_fp16": {
+   "n": 12,
+   "finite": 12,
+   "rel_err_max": 0.8808041214942932,
+   "rel_err_median": 0.6120865941047668,
+   "cos_min": 0.6344295740127563
+  },
+  "plan_fp16": {
+   "n": 12,
+   "finite": 12,
+   "rel_err_max": 0.01024835929274559,
+   "rel_err_median": 0.00196295534260571,
+   "cos_min": 0.9999490976333618
+  }
+ },
+ "extra_summary": {
+  "plain_fp16": {
+   "n": 4,
+   "finite": 4,
+   "rel_err_max": 0.6602399945259094,
+   "rel_err_median": 0.622768759727478,
+   "cos_min": 0.7927462458610535
+  },
+  "plan_fp16": {
+   "n": 4,
+   "finite": 4,
+   "rel_err_max": 0.0019739477429538965,
+   "rel_err_median": 0.0018339488888159394,
+   "cos_min": 0.9999988079071045
+  }
+ },
+ "plan": "28 operations above 16,376 that run in float16 -> 18 fix(es) (\"margin only\" = the peak fits float16 already; the fix only buys the requested headroom)\n- residual stream (48 adds, peak 374,201): keep in float32 (a writer has no proportional path to a value that fits)\n  [margin only]\n- float32 island: encoder.block.18.layer.1.DenseReluDense.act (peak 61,221; no proportional path back to a value that fits)\n- float32 island: encoder.block.18.layer.1.DenseReluDense.wo (peak 96,146; no proportional path back to a value that fits)\n- float32 island: encoder.block.18.layer.1.dropout (peak 96,146; no proportional path back to a value that fits)\n- float32 island: encoder.block.19.layer.1.DenseReluDense.act (peak 250,102; no proportional path back to a value that fits)\n- float32 island: encoder.block.19.layer.1.DenseReluDense.wo (peak 206,723; no proportional path back to a value that fits)\n- float32 island: encoder.block.19.layer.1.dropout (peak 206,723; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.20.layer.1.DenseReluDense.act (peak 40,723; no proportional path back to a value that fits)\n- float32 island: encoder.block.20.layer.1.DenseReluDense.wo (peak 119,704; no proportional path back to a value that fits)\n- float32 island: encoder.block.20.layer.1.dropout (peak 119,704; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.21.layer.1.DenseReluDense.wo (peak 22,932; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.21.layer.1.dropout (peak 22,932; no proportional path back to a value that fits)\n- float32 island: encoder.block.22.layer.1.DenseReluDense.act (peak 182,987; no proportional path back to a value that fits)\n- float32 island: encoder.block.22.layer.1.DenseReluDense.wo (peak 83,528; no proportional path back to a value that fits)\n- float32 island: encoder.block.22.layer.1.dropout (peak 83,528; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.23.layer.1.DenseReluDense.act (peak 16,628; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.23.layer.1.DenseReluDense.wo (peak 37,651; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.23.layer.1.dropout (peak 37,651; no proportional path back to a value that fits)"
+}
