@@ -1,0 +1,42 @@
+======================================================================
+- bpm: N/A
+- timesignature: N/A
+- keyscale: N/A
+- duration: 30 seconds
+GEN fp16-stock False 36.6 s Error: Generation produced NaN or Inf latents (shape=[1, 750, 64], dtype=torch.f
+======================================================================
+- bpm: N/A
+- timesignature: N/A
+- keyscale: N/A
+- duration: 30 seconds
+GEN fp32-recorded True 65.0 s Generation completed successfully!
+======================================================================
+- bpm: N/A
+- timesignature: N/A
+- keyscale: N/A
+- duration: 30 seconds
+GEN fp32 True 30.3 s Generation completed successfully!
+119 operations above 16,376 that run in float16 -> 4 fix(es) ("margin only" = the peak fits float16 already; the fix only buys the requested headroom)
+- residual stream (16 adds, peak 504,815 at encoder.lyric_encoder.layers.7): divide by 32 -> shrink at: output of encoder.lyric_encoder.embed_tokens (linear, 1x); output of encoder.lyric_encoder.layers.N.self_attn.o_proj (linear, 8x); output of encoder.lyric_encoder.layers.N.mlp.down_proj (linear, 7x); output of encoder.lyric_encoder.layers.N.mlp (mul, 1x); norms' eps / 1024: encoder.lyric_encoder.layers.N.input_layernorm, encoder.lyric_encoder.layers.N.post_attention_layernorm, encoder.lyric_encoder.norm
+- residual stream (96 adds, peak 1,153,176 at decoder.layers.18): divide by 128 -> shrink at: output of decoder.proj_in.N (conv1d, 1x); output of decoder.layers.N (mul, 20x); output of decoder.layers.N.cross_attn.o_proj (linear, 32x); output of decoder.layers.N.mlp.down_proj (linear, 23x); output of decoder.layers.N.self_attn.o_proj (linear, 15x); norms' eps / 16384: decoder.layers.N.cross_attn_norm, decoder.layers.N.mlp_norm, decoder.layers.N.self_attn_norm, decoder.norm_out
+- attention scores at decoder.layers.0.self_attn (peak 128,143): move the x0.08839 scale to output of decoder.layers.N.self_attn.q_norm (mul, 1x) -> scores 11,326
+  [margin only]
+- attention scores at decoder.layers.30.self_attn (peak 22,834): move the x0.08839 scale to output of decoder.layers.N.self_attn.q_norm (mul, 1x) -> scores 2,018
+======================================================================
+- bpm: N/A
+- timesignature: N/A
+- keyscale: N/A
+- duration: 30 seconds
+GEN fp16-plan True 9.8 s Generation completed successfully!
+======================================================================
+- bpm: N/A
+- timesignature: N/A
+- keyscale: N/A
+- duration: 30 seconds
+GEN fp16-hand True 9.8 s Generation completed successfully!
+fp16_stock {"ok": false}
+fp16_plan {"ok": true, "rms": 0.09765485674142838, "wave_corr": 0.8626018762588501, "logmel_corr": 0.9884625673294067}
+fp16_hand {"ok": true, "rms": 0.09882465749979019, "wave_corr": 0.8163676261901855, "logmel_corr": 0.9855706691741943}
+control: two float32 runs, waveform corr 1.0 | plan vs hand fixes (both float16), waveform corr 0.9207
+first denoising step, relative error vs float32: {"fp16-stock": NaN, "fp16-plan": 0.0034867413341999054, "fp16-hand": 0.003485754830762744}
+time: float32 30.3 s, float16 + plan hooks 9.8 s, float16 + hand fixes 9.8 s

@@ -1,0 +1,37 @@
+{
+ "control_fp32_vs_fp32_wave_corr": 1.0,
+ "plan_vs_hand_wave_corr": 0.9207131266593933,
+ "first_step_rel_err": {
+  "fp16-stock": NaN,
+  "fp16-plan": 0.0034867413341999054,
+  "fp16-hand": 0.003485754830762744
+ },
+ "ckpt": "acestep-v15-xl-sft",
+ "steps": 50,
+ "cfg": 7.0,
+ "plan": "119 operations above 16,376 that run in float16 -> 4 fix(es) (\"margin only\" = the peak fits float16 already; the fix only buys the requested headroom)\n- residual stream (16 adds, peak 504,815 at encoder.lyric_encoder.layers.7): divide by 32 -> shrink at: output of encoder.lyric_encoder.embed_tokens (linear, 1x); output of encoder.lyric_encoder.layers.N.self_attn.o_proj (linear, 8x); output of encoder.lyric_encoder.layers.N.mlp.down_proj (linear, 7x); output of encoder.lyric_encoder.layers.N.mlp (mul, 1x); norms' eps / 1024: encoder.lyric_encoder.layers.N.input_layernorm, encoder.lyric_encoder.layers.N.post_attention_layernorm, encoder.lyric_encoder.norm\n- residual stream (96 adds, peak 1,153,176 at decoder.layers.18): divide by 128 -> shrink at: output of decoder.proj_in.N (conv1d, 1x); output of decoder.layers.N (mul, 20x); output of decoder.layers.N.cross_attn.o_proj (linear, 32x); output of decoder.layers.N.mlp.down_proj (linear, 23x); output of decoder.layers.N.self_attn.o_proj (linear, 15x); norms' eps / 16384: decoder.layers.N.cross_attn_norm, decoder.layers.N.mlp_norm, decoder.layers.N.self_attn_norm, decoder.norm_out\n- attention scores at decoder.layers.0.self_attn (peak 128,143): move the x0.08839 scale to output of decoder.layers.N.self_attn.q_norm (mul, 1x) -> scores 11,326\n  [margin only]\n- attention scores at decoder.layers.30.self_attn (peak 22,834): move the x0.08839 scale to output of decoder.layers.N.self_attn.q_norm (mul, 1x) -> scores 2,018",
+ "fp32_s": 30.28816270828247,
+ "plan_s": 9.774531364440918,
+ "hand_s": 9.75501275062561,
+ "fp32": {
+  "ok": true,
+  "rms": 0.09127409011125565,
+  "wave_corr": 1.0,
+  "logmel_corr": 0.9999999403953552
+ },
+ "fp16_stock": {
+  "ok": false
+ },
+ "fp16_plan": {
+  "ok": true,
+  "rms": 0.09765485674142838,
+  "wave_corr": 0.8626018762588501,
+  "logmel_corr": 0.9884625673294067
+ },
+ "fp16_hand": {
+  "ok": true,
+  "rms": 0.09882465749979019,
+  "wave_corr": 0.8163676261901855,
+  "logmel_corr": 0.9855706691741943
+ }
+}

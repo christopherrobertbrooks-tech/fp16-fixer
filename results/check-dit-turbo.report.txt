@@ -1,0 +1,40 @@
+======================================================================
+- bpm: N/A
+- timesignature: N/A
+- keyscale: N/A
+- duration: 30 seconds
+GEN fp16-stock False 3.1 s Error: Generation produced NaN or Inf latents (shape=[1, 750, 64], dtype=torch.f
+======================================================================
+- bpm: N/A
+- timesignature: N/A
+- keyscale: N/A
+- duration: 30 seconds
+GEN fp32-recorded True 4.4 s Generation completed successfully!
+======================================================================
+- bpm: N/A
+- timesignature: N/A
+- keyscale: N/A
+- duration: 30 seconds
+GEN fp32 True 2.2 s Generation completed successfully!
+4 operations above 16,376 that run in float16 -> 2 fix(es) ("margin only" = the peak fits float16 already; the fix only buys the requested headroom)
+- residual stream (16 adds, peak 504,648 at encoder.lyric_encoder.layers.7): divide by 32 -> shrink at: output of encoder.lyric_encoder.embed_tokens (linear, 1x); output of encoder.lyric_encoder.layers.N.self_attn.o_proj (linear, 8x); output of encoder.lyric_encoder.layers.N.mlp.down_proj (linear, 7x); output of encoder.lyric_encoder.layers.N.mlp (mul, 1x); norms' eps / 1024: encoder.lyric_encoder.layers.N.input_layernorm, encoder.lyric_encoder.layers.N.post_attention_layernorm, encoder.lyric_encoder.norm
+  [margin only]
+- residual stream (72 adds, peak 27,114 at decoder.layers.23): divide by 2 -> shrink at: output of decoder.proj_in.N (conv1d, 1x); output of decoder.layers.N (mul, 24x); output of decoder.layers.N.cross_attn.o_proj (linear, 24x); output of decoder.layers.N.mlp.down_proj (linear, 1x); norms' eps / 4: decoder.layers.N.cross_attn_norm, decoder.layers.N.mlp_norm, decoder.layers.N.self_attn_norm, decoder.norm_out
+======================================================================
+- bpm: N/A
+- timesignature: N/A
+- keyscale: N/A
+- duration: 30 seconds
+GEN fp16-plan True 1.1 s Generation completed successfully!
+======================================================================
+- bpm: N/A
+- timesignature: N/A
+- keyscale: N/A
+- duration: 30 seconds
+GEN fp16-hand True 1.1 s Generation completed successfully!
+fp16_stock {"ok": false}
+fp16_plan {"ok": true, "rms": 0.12905505299568176, "wave_corr": 0.9938341379165649, "logmel_corr": 0.9968298673629761}
+fp16_hand {"ok": true, "rms": 0.13209499418735504, "wave_corr": 0.9991256594657898, "logmel_corr": 0.9969140887260437}
+control: two float32 runs, waveform corr 1.0 | plan vs hand fixes (both float16), waveform corr 0.9946
+first denoising step, relative error vs float32: {"fp16-stock": NaN, "fp16-plan": 0.03532826527953148, "fp16-hand": 0.042614568024873734}
+time: float32 2.2 s, float16 + plan hooks 1.1 s, float16 + hand fixes 1.1 s

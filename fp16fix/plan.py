@@ -164,7 +164,10 @@ class Plan:
         fix = {"rule": "residual stream", "nodes": sorted(comp, key=lambda c: self.order.get(c, 0)), "peak": peak,
                "peak_at": max(comp, key=self.v), "factor": factor}
         if non_norm:
-            fix.update(rule="residual stream in float32", why=f"read by non-norm modules: {non_norm[:4]}")
+            fix.update(rule="residual stream in float32", why=f"read by non-norm modules: {non_norm[:4]}",
+                       readers=sorted({r[0] for r in readers}),
+                       readers_keep_float32=sorted({r[0] for r in readers if self.v(r) > FP16_MAX}),
+                       first_value=sorted(w for w in writers if len(self.succs.get(w, ())) > 1 and self.v(w) > self.lim))
             for c in list(comp) + [w for w in writers if len(self.succs.get(w, ())) > 1]:   # + its first value
                 self.covered[c] = fix
             return fix

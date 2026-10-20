@@ -1,0 +1,23 @@
+{
+ "plan": "55 operations above 16,376 that run in float16 -> 1 fix(es) (\"margin only\" = the peak fits float16 already; the fix only buys the requested headroom)\n- residual stream (56 adds, peak 1,958,926 at model.layers.27): divide by 128 -> shrink at: output of model.embed_tokens (embedding, 1x); output of model.layers.N.self_attn.o_proj (linear, 28x); output of model.layers.N.mlp.down_proj (linear, 25x); output of model.layers.N.mlp.up_proj (linear, 1x); output of model.layers.N.mlp (mul, 2x); norms' eps / 16384: model.layers.N.input_layernorm, model.layers.N.post_attention_layernorm, model.norm",
+ "prompts": [
+  {
+   "prompt": 0,
+   "stock_finite": false,
+   "plan_top1": 1.0,
+   "plan_rel_err": 0.1537400633096695
+  },
+  {
+   "prompt": 1,
+   "stock_finite": false,
+   "plan_top1": 0.9791666865348816,
+   "plan_rel_err": 0.038698166608810425
+  },
+  {
+   "prompt": 2,
+   "stock_finite": false,
+   "plan_top1": 0.9583333730697632,
+   "plan_rel_err": 0.03140697628259659
+  }
+ ]
+}
