@@ -1,0 +1,14 @@
+======================================================================
+GEN fp16 False Error: Generation produced NaN or Inf latents (shape=[1, 750, 64], dtype=torch.float16, device=cuda:
+======================================================================
+GEN fp32 True Generation completed successfully!
+=== song model acestep-v15-turbo, 8 steps, CFG 1.0: 7 tensors above 16,376 (FP16 max / 4); largest anywhere 340,282,346,638,528,859,811,704,183,484,516,925,440
+site (layers collapsed)                                    module                 what                               peak  at
+encoder.lyric_encoder.layers.N                             AceStepEncoderLayer    op:add                          504,648  encoder.lyric_encoder.layers.7 (1 layer(s))
+encoder.lyric_encoder.layers.N.mlp.down_proj               Linear                 op:linear                       504,584  encoder.lyric_encoder.layers.7.mlp.down_proj (1 layer(s))
+encoder.lyric_encoder.layers.N.mlp.down_proj               Linear                 output                          504,584  encoder.lyric_encoder.layers.7.mlp.down_proj (1 layer(s))
+encoder.lyric_encoder.layers.N.mlp                         Qwen3MLP               output                          504,584  encoder.lyric_encoder.layers.7.mlp (1 layer(s))
+encoder.lyric_encoder.layers.N                             AceStepEncoderLayer    output                          504,648  encoder.lyric_encoder.layers.7 (1 layer(s))
+decoder.layers.N                                           AceStepDiTLayer        op:add                           24,026  decoder.layers.23 (1 layer(s))
+decoder.layers.N                                           AceStepDiTLayer        output                           24,026  decoder.layers.23 (1 layer(s))
+plain float16 run: first non-finite at encoder.lyric_encoder.layers.7 op:add (2315 sites in all)

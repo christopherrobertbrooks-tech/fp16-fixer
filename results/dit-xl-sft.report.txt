@@ -1,0 +1,16 @@
+======================================================================
+GEN fp16 False Error: Generation produced NaN or Inf latents (shape=[1, 750, 64], dtype=torch.float16, device=cuda:
+======================================================================
+GEN fp32 True Generation completed successfully!
+=== song model acestep-v15-xl-sft, 50 steps, CFG 7.0: 87 tensors above 16,376 (FP16 max / 4); largest anywhere 340,282,346,638,528,859,811,704,183,484,516,925,440
+site (layers collapsed)                                    module                 what                               peak  at
+encoder.lyric_encoder.layers.N                             AceStepEncoderLayer    op:add                          504,815  encoder.lyric_encoder.layers.7 (1 layer(s))
+encoder.lyric_encoder.layers.N.mlp.down_proj               Linear                 op:linear                       504,749  encoder.lyric_encoder.layers.7.mlp.down_proj (1 layer(s))
+encoder.lyric_encoder.layers.N.mlp.down_proj               Linear                 output                          504,749  encoder.lyric_encoder.layers.7.mlp.down_proj (1 layer(s))
+encoder.lyric_encoder.layers.N.mlp                         Qwen3MLP               output                          504,749  encoder.lyric_encoder.layers.7.mlp (1 layer(s))
+encoder.lyric_encoder.layers.N                             AceStepEncoderLayer    output                          504,815  encoder.lyric_encoder.layers.7 (1 layer(s))
+decoder.layers.N.self_attn                                 AceStepAttention       op:matmul                       128,144  decoder.layers.0.self_attn (2 layer(s))
+decoder.layers.N                                           AceStepDiTLayer        op:add                        1,150,339  decoder.layers.18 (27 layer(s))
+decoder.layers.N                                           AceStepDiTLayer        output                        1,150,339  decoder.layers.18 (27 layer(s))
+decoder.layers.N                                           AceStepDiTLayer        op:mul                        1,069,260  decoder.layers.14 (26 layer(s))
+plain float16 run: first non-finite at encoder.lyric_encoder.layers.7 op:add (3075 sites in all)
