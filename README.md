@@ -151,6 +151,9 @@ epsilon / 1024.** The RFC's fix, with a power-of-two factor (peak 299,939 needs 
 
 Weights: Unsloth's ungated copy (`unsloth/gemma-3-4b-it`, the Gemma licence applies), text only.
 
+A ready-made plan for Wan 2.2's umT5-XXL, calibrated and checked on held-out prompts:
+[plans/wan22-umt5-xxl](plans/wan22-umt5-xxl).
+
 Not tried: MiniMax H3 itself (its smallest 16-bit setup is ~95 GB of weights, beyond a 32 GB V100 with 16 GB of RAM).
 
 Limits: tried on three model families (ACE-Step 1.5 + its Qwen3-based LMs, umT5, Gemma 3); the hooks run every operation through a
