@@ -8,7 +8,7 @@ correlation and log-mel correlation; NaN / failure.
 """
 CWD = __import__("os").getcwd()
 import json, os, sys, time
-ROOT = "/mnt/steam/ace-step/ACE-Step-1.5"; HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.environ.get("ACESTEP_ROOT", "/mnt/steam/ace-step/ACE-Step-1.5"); HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path[:0] = [os.path.join(HERE, ".."), HERE, ROOT]; os.chdir(ROOT)
 import torch, soundfile, torchaudio
 import acestep.core.generation.handler.init_service_loader as isl
@@ -48,7 +48,7 @@ def gen(tag):
     h = first_step(tag)
     t0 = time.time()
     r = generate_music(dit, LLMHandler(), params=params, config=GenerationConfig(batch_size=1, audio_format="wav", use_random_seed=False, seeds=[1234]),
-                       save_dir=f"/mnt/steam/fp16-fixer/work/check-{ckpt}-{tag}")
+                       save_dir=f"{os.environ.get('FP16FIX_WORK', '/tmp/fp16fix-work')}/check-{ckpt}-{tag}")
     dt = time.time() - t0
     h.remove()
     path = r.audios[0]["path"] if r.success and r.audios else None

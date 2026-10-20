@@ -10,6 +10,32 @@ where no such boundary exists.
 check against float32 -- including a model nobody had fixed by hand (the 4B LM), **and on two models outside
 ACE-Step: Wan 2.2's umT5-XXL text encoder and Gemma 3 4B.**
 
+## Use
+
+```python
+import torch
+from fp16fix import Recorder
+from fp16fix.plan import Plan, save_fixes, load_fixes
+from fp16fix.apply import Applied
+
+with torch.no_grad():
+    with Recorder(model) as r32:          # 1. the model in float32, on a few representative inputs
+        run(model)
+    model.half()
+    with Recorder(model) as r16:          #    and the same inputs in plain float16
+        run(model)
+    plan = Plan(r32, r16)                 # 2. the fixes (print(plan.describe()) to read them)
+    save_fixes(plan.fixes, "plan.json")
+
+# later, at load time: the float16 model and the saved plan
+with torch.no_grad(), Applied(model, load_fixes("plan.json")):   # 3. hooks on, no weight changed
+    out = run(model)
+```
+
+Needs PyTorch 2.x (tested with 2.10). The drivers in `drivers/` are the runs below; they read model locations from
+`ACESTEP_ROOT`, `WAN_MODEL` and `GEMMA_MODEL`. A plan is only as good as its calibration inputs: values that only
+appear for other inputs are not covered, so calibrate on inputs like the ones you will run.
+
 ## Step 1: find (`fp16fix/find.py`)
 
 One float32 pass and one plain float16 pass over the same inputs, recorded by:
@@ -134,7 +160,7 @@ decoding); a plan is made per model from one calibration set (the 8 example song
 ## Tests
 
 `tests/test_find.py` (9), `tests/test_plan.py` (5, the planner on toy models with known answers) and
-`tests/test_apply.py` (4: plain float16 gives NaN, float16 with the plan is finite and within 2% of float32, hooks and
+`tests/test_apply.py` (5: plain float16 gives NaN, float16 with the plan is finite and within 2% of float32, hooks and
 epsilons restored). `test_find.py`: a toy model with planted sites -- a SwiGLU product, q.k scores (eager and SDPA), a residual
 stream -- must be found and clean blocks must stay quiet; masks aren't overflows; hooks are removed; operations are seen
 when the model runs in another thread. Disabling the `Linear` input hooks or the function mode makes them fail.

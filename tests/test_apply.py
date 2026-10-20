@@ -55,3 +55,20 @@ def test_float32_stream_readers_judged_by_module_output():
     stock, fixed, again, rel, plan, _ = check(Direct().eval())
     f = [x for x in plan.fixes if x["rule"] == "residual stream in float32"][0]
     assert not any(m.endswith((".n1", ".n2")) for m in f["readers_keep_float32"]), f["readers_keep_float32"]
+
+
+def test_a_saved_plan_works_after_loading(tmp_path):
+    from fp16fix.plan import save_fixes, load_fixes
+    torch.manual_seed(0)
+    model = Toy().eval()
+    x = torch.randn(1, 32, 64)
+    with torch.no_grad():
+        with Recorder(model) as r32:
+            ref = model(x)
+        half = copy.deepcopy(model).half()
+        with Recorder(half) as r16:
+            half(x.half())
+        save_fixes(Plan(r32, r16).fixes, tmp_path / "plan.json")
+        with Applied(half, load_fixes(tmp_path / "plan.json")):
+            out = half(x.half())
+    assert torch.isfinite(out).all() and ((out.float() - ref).norm() / ref.norm()).item() < 2e-2

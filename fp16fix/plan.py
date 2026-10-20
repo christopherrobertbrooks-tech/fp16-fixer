@@ -276,3 +276,16 @@ class Plan:
             else:
                 lines.append(f"- float32 island: {f['module']} (peak {f['peak']:,.0f}; {f['why']})")
         return "\n".join(lines)
+
+
+def save_fixes(fixes, path):
+    """Write a plan's fixes as JSON (made once from a calibration run, reused at load time)."""
+    import json
+    with open(path, "w") as f:
+        json.dump(fixes, f, indent=1, default=lambda o: sorted(o) if isinstance(o, set) else list(o))
+
+
+def load_fixes(path):
+    import json
+    with open(path) as f:
+        return json.load(f)
