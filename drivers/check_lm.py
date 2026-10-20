@@ -5,7 +5,7 @@ with float32 on the continuation positions, and logits relative error.
 Hand fix for comparison (D-nanovllm-fp16.md): float16 top-token agreement with float32 100% / 80% / 100%."""
 CWD = __import__("os").getcwd()
 import copy, json, os, sys
-ROOT = "/mnt/steam/ace-step/ACE-Step-1.5"; HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.environ.get("ACESTEP_ROOT", "/mnt/steam/ace-step/ACE-Step-1.5"); HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path[:0] = [os.path.join(HERE, "..")]; os.chdir(ROOT)
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer

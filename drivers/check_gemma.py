@@ -13,7 +13,7 @@ from fp16fix import Recorder
 from fp16fix.plan import Plan
 from fp16fix.apply import Applied
 from common import show
-M = "/mnt/nvme/models/gemma-3-4b-it"; out = os.path.join(CWD, sys.argv[1])
+M = os.environ.get("GEMMA_MODEL", "/mnt/nvme/models/gemma-3-4b-it"); out = os.path.join(CWD, sys.argv[1])
 tok = AutoTokenizer.from_pretrained(M)
 model = Gemma3ForConditionalGeneration.from_pretrained(M, dtype=torch.float32, attn_implementation="eager", device_map={"": 0}).eval()
 prompts = ["Explain in three sentences why the sky is blue.",

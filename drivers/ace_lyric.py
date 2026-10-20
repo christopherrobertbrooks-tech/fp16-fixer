@@ -2,7 +2,7 @@
 """ACE-Step 1.5 lyric encoder in float32 on the 8 example songs, recorded by fp16fix (answer key: volta-ace-step
 README -- layers[-1].mlp.down_proj peaks ~505,000; everything before it stays under ~11,500)."""
 import json, os, sys
-CWD = __import__("os").getcwd(); ROOT = "/mnt/steam/ace-step/ACE-Step-1.5"; HERE = os.path.dirname(os.path.abspath(__file__))
+CWD = __import__("os").getcwd(); ROOT = os.environ.get("ACESTEP_ROOT", "/mnt/steam/ace-step/ACE-Step-1.5"); HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path[:0] = [os.path.join(HERE, ".."), HERE, ROOT]; os.chdir(ROOT)
 import torch
 from transformers import AutoModel, AutoTokenizer
