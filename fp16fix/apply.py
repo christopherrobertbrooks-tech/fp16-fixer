@@ -8,7 +8,8 @@ keeps the same per-thread module stack and counters, so it recognises each plann
   (or divide) after q @ k^T into a pass-through;
 - a product fix: multiply the next linear layer's output back by the factor;
 - norms: divide their epsilon by factor^2 (an attribute; restored on exit);
-- a float32 island: run every operation inside that module in float32 and hand back the input dtype.
+- a float32 island: run every operation inside that module in float32; hand its output back in the model's dtype
+  (or keep it in float32 when its peak doesn't fit float16).
 
     with Applied(model, plan.fixes):
         model(...)
@@ -101,6 +102,12 @@ class Applied:
             if tl.stack and tl.stack[-1] == path:
                 tl.stack.pop()
                 tl.counters.pop()
+            if path in self.islands and not self.islands[path]:
+                tl.busy = True                    # the island's output, back in the model's dtype
+                try:
+                    out = self._cast(out, self.dtype)
+                finally:
+                    tl.busy = False
             if path in self.mult_back:
                 tl.busy = True                    # our own multiply must not be counted as one of the model's ops
                 try:
@@ -112,6 +119,16 @@ class Applied:
                 tl.mode = None
             return out
         return f
+
+    @staticmethod
+    def _cast(out, dtype):
+        if isinstance(out, torch.Tensor):
+            return out.to(dtype) if out.is_floating_point() else out
+        if isinstance(out, tuple):
+            return tuple(Applied._cast(o, dtype) for o in out)
+        if hasattr(out, "last_hidden_state"):
+            out.last_hidden_state = out.last_hidden_state.to(dtype)
+        return out
 
     @staticmethod
     def _scale(out, factor, float32=False):
@@ -156,8 +173,8 @@ class Applied:
                     cnt[name] += 1
                     if key in ap.out_scale:
                         out = Applied._scale(out, ap.out_scale[key])
-                    if island and not keep32 and isinstance(out, torch.Tensor) and out.is_floating_point():
-                        out = out.to(ap.dtype)            # hand back the model's own dtype
+                    # inside an island everything stays float32; only the island module's own output is handed
+                    # back in the model's dtype (in _post), so a norm can square a float32 stream safely
                     for o in _tensors(out):
                         try:
                             tl.made[id(o)] = weakref.ref(o)
