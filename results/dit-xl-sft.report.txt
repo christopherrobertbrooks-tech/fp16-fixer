@@ -1,16 +1,30 @@
 ======================================================================
+- bpm: N/A
+- timesignature: N/A
+- keyscale: N/A
+- duration: 30 seconds
 GEN fp16 False Error: Generation produced NaN or Inf latents (shape=[1, 750, 64], dtype=torch.float16, device=cuda:
 ======================================================================
+- bpm: N/A
+- timesignature: N/A
+- keyscale: N/A
+- duration: 30 seconds
 GEN fp32 True Generation completed successfully!
-=== song model acestep-v15-xl-sft, 50 steps, CFG 7.0: 87 tensors above 16,376 (FP16 max / 4); largest anywhere 340,282,346,638,528,859,811,704,183,484,516,925,440
+=== song model acestep-v15-xl-sft, 50 steps, CFG 7.0: 87 tensors above 16,376 (FP16 max / 4); largest anywhere (masks aside) 1,360,326,557,696
 site (layers collapsed)                                    module                 what                               peak  at
 encoder.lyric_encoder.layers.N                             AceStepEncoderLayer    op:add                          504,815  encoder.lyric_encoder.layers.7 (1 layer(s))
 encoder.lyric_encoder.layers.N.mlp.down_proj               Linear                 op:linear                       504,749  encoder.lyric_encoder.layers.7.mlp.down_proj (1 layer(s))
 encoder.lyric_encoder.layers.N.mlp.down_proj               Linear                 output                          504,749  encoder.lyric_encoder.layers.7.mlp.down_proj (1 layer(s))
 encoder.lyric_encoder.layers.N.mlp                         Qwen3MLP               output                          504,749  encoder.lyric_encoder.layers.7.mlp (1 layer(s))
 encoder.lyric_encoder.layers.N                             AceStepEncoderLayer    output                          504,815  encoder.lyric_encoder.layers.7 (1 layer(s))
-decoder.layers.N.self_attn                                 AceStepAttention       op:matmul                       128,144  decoder.layers.0.self_attn (2 layer(s))
-decoder.layers.N                                           AceStepDiTLayer        op:add                        1,150,339  decoder.layers.18 (27 layer(s))
-decoder.layers.N                                           AceStepDiTLayer        output                        1,150,339  decoder.layers.18 (27 layer(s))
-decoder.layers.N                                           AceStepDiTLayer        op:mul                        1,069,260  decoder.layers.14 (26 layer(s))
+decoder.layers.N.self_attn                                 AceStepAttention       op:matmul                       128,143  decoder.layers.0.self_attn (2 layer(s))
+decoder.layers.N                                           AceStepDiTLayer        op:add                        1,166,330  decoder.layers.18 (27 layer(s))
+decoder.layers.N                                           AceStepDiTLayer        output                        1,166,330  decoder.layers.18 (27 layer(s))
+decoder.layers.N                                           AceStepDiTLayer        op:mul                        1,085,374  decoder.layers.14 (26 layer(s))
 plain float16 run: first non-finite at encoder.lyric_encoder.layers.7 op:add (3075 sites in all)
+PLAN:
+119 operations above 16,376 that run in float16 -> 4 fix(es)
+- residual stream (16 adds, peak 504,815 at encoder.lyric_encoder.layers.7): divide by 32 -> shrink at: output of encoder.lyric_encoder.embed_tokens (linear, 1x); output of encoder.lyric_encoder.layers.N.self_attn.o_proj (linear, 8x); output of encoder.lyric_encoder.layers.N.mlp.down_proj (linear, 7x); output of encoder.lyric_encoder.layers.N.mlp (mul, 1x); norms' eps / 1024: encoder.lyric_encoder.layers.N.input_layernorm, encoder.lyric_encoder.layers.N.post_attention_layernorm, encoder.lyric_encoder.norm
+- residual stream (96 adds, peak 1,166,330 at decoder.layers.18): divide by 128 -> shrink at: output of decoder.proj_in.N (conv1d, 1x); output of decoder.layers.N (mul, 20x); output of decoder.layers.N.cross_attn.o_proj (linear, 32x); output of decoder.layers.N.mlp.down_proj (linear, 23x); output of decoder.layers.N.self_attn.o_proj (linear, 15x); norms' eps / 16384: decoder.layers.N.cross_attn_norm, decoder.layers.N.mlp_norm, decoder.layers.N.self_attn_norm, decoder.norm_out
+- attention scores at decoder.layers.0.self_attn (peak 128,143): move the x0.08839 scale to output of decoder.layers.N.self_attn.q_norm (mul, 1x) -> scores 11,326
+- attention scores at decoder.layers.30.self_attn (peak 22,772): move the x0.08839 scale to output of decoder.layers.N.self_attn.q_norm (mul, 1x) -> scores 2,013

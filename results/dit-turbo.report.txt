@@ -1,14 +1,26 @@
 ======================================================================
+- bpm: N/A
+- timesignature: N/A
+- keyscale: N/A
+- duration: 30 seconds
 GEN fp16 False Error: Generation produced NaN or Inf latents (shape=[1, 750, 64], dtype=torch.float16, device=cuda:
 ======================================================================
+- bpm: N/A
+- timesignature: N/A
+- keyscale: N/A
+- duration: 30 seconds
 GEN fp32 True Generation completed successfully!
-=== song model acestep-v15-turbo, 8 steps, CFG 1.0: 7 tensors above 16,376 (FP16 max / 4); largest anywhere 340,282,346,638,528,859,811,704,183,484,516,925,440
+=== song model acestep-v15-turbo, 8 steps, CFG 1.0: 9 tensors above 16,376 (FP16 max / 4); largest anywhere (masks aside) 254,669,914,112
 site (layers collapsed)                                    module                 what                               peak  at
 encoder.lyric_encoder.layers.N                             AceStepEncoderLayer    op:add                          504,648  encoder.lyric_encoder.layers.7 (1 layer(s))
 encoder.lyric_encoder.layers.N.mlp.down_proj               Linear                 op:linear                       504,584  encoder.lyric_encoder.layers.7.mlp.down_proj (1 layer(s))
 encoder.lyric_encoder.layers.N.mlp.down_proj               Linear                 output                          504,584  encoder.lyric_encoder.layers.7.mlp.down_proj (1 layer(s))
 encoder.lyric_encoder.layers.N.mlp                         Qwen3MLP               output                          504,584  encoder.lyric_encoder.layers.7.mlp (1 layer(s))
 encoder.lyric_encoder.layers.N                             AceStepEncoderLayer    output                          504,648  encoder.lyric_encoder.layers.7 (1 layer(s))
-decoder.layers.N                                           AceStepDiTLayer        op:add                           24,026  decoder.layers.23 (1 layer(s))
-decoder.layers.N                                           AceStepDiTLayer        output                           24,026  decoder.layers.23 (1 layer(s))
+decoder.layers.N                                           AceStepDiTLayer        op:add                           23,898  decoder.layers.23 (2 layer(s))
+decoder.layers.N                                           AceStepDiTLayer        output                           23,898  decoder.layers.23 (2 layer(s))
 plain float16 run: first non-finite at encoder.lyric_encoder.layers.7 op:add (2315 sites in all)
+PLAN:
+4 operations above 16,376 that run in float16 -> 2 fix(es)
+- residual stream (16 adds, peak 504,648 at encoder.lyric_encoder.layers.7): divide by 32 -> shrink at: output of encoder.lyric_encoder.embed_tokens (linear, 1x); output of encoder.lyric_encoder.layers.N.self_attn.o_proj (linear, 8x); output of encoder.lyric_encoder.layers.N.mlp.down_proj (linear, 7x); output of encoder.lyric_encoder.layers.N.mlp (mul, 1x); norms' eps / 1024: encoder.lyric_encoder.layers.N.input_layernorm, encoder.lyric_encoder.layers.N.post_attention_layernorm, encoder.lyric_encoder.norm
+- residual stream (72 adds, peak 23,898 at decoder.layers.23): divide by 2 -> shrink at: output of decoder.proj_in.N (conv1d, 1x); output of decoder.layers.N (mul, 24x); output of decoder.layers.N.cross_attn.o_proj (linear, 24x); norms' eps / 4: decoder.layers.N.cross_attn_norm, decoder.layers.N.mlp_norm, decoder.layers.N.self_attn_norm, decoder.norm_out

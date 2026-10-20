@@ -1,0 +1,61 @@
+{
+ "plan": "2 operations above 16,376 that run in float16 -> 1 fix(es) (\"margin only\" = the peak fits float16 already; the fix only buys the requested headroom)\n- residual stream (16 adds, peak 504,693 at layers.7): divide by 32 -> shrink at: output of embed_tokens (linear, 1x); output of layers.N.self_attn.o_proj (linear, 8x); output of layers.N.mlp.down_proj (linear, 7x); output of layers.N.mlp (mul, 1x); norms' eps / 1024: layers.N.input_layernorm, layers.N.post_attention_layernorm, norm",
+ "songs": [
+  {
+   "song": "01",
+   "tokens": 239,
+   "stock_finite": false,
+   "plan_finite": true,
+   "plan_rel_err": 0.002799919107928872
+  },
+  {
+   "song": "02",
+   "tokens": 498,
+   "stock_finite": false,
+   "plan_finite": true,
+   "plan_rel_err": 0.02400960773229599
+  },
+  {
+   "song": "03",
+   "tokens": 866,
+   "stock_finite": false,
+   "plan_finite": true,
+   "plan_rel_err": 0.005405038595199585
+  },
+  {
+   "song": "05",
+   "tokens": 573,
+   "stock_finite": false,
+   "plan_finite": true,
+   "plan_rel_err": 0.008392825722694397
+  },
+  {
+   "song": "10",
+   "tokens": 327,
+   "stock_finite": false,
+   "plan_finite": true,
+   "plan_rel_err": 0.008858283050358295
+  },
+  {
+   "song": "113",
+   "tokens": 158,
+   "stock_finite": false,
+   "plan_finite": true,
+   "plan_rel_err": 0.004200286697596312
+  },
+  {
+   "song": "118",
+   "tokens": 140,
+   "stock_finite": false,
+   "plan_finite": true,
+   "plan_rel_err": 0.011634345166385174
+  },
+  {
+   "song": "108",
+   "tokens": 83,
+   "stock_finite": false,
+   "plan_finite": true,
+   "plan_rel_err": 0.004893277771770954
+  }
+ ]
+}
