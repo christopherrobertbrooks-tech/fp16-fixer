@@ -13,7 +13,8 @@ from fp16fix import Recorder
 from fp16fix.plan import Plan
 from fp16fix.apply import Applied
 from common import show
-M = os.environ.get("GEMMA_MODEL", "/mnt/nvme/models/gemma-3-4b-it"); out = os.path.join(CWD, sys.argv[1])
+from env import need
+M = need("GEMMA_MODEL"); out = os.path.join(CWD, sys.argv[1])
 tok = AutoTokenizer.from_pretrained(M)
 model = Gemma3ForConditionalGeneration.from_pretrained(M, dtype=torch.float32, attn_implementation="eager", device_map={"": 0}).eval()
 prompts = ["Explain in three sentences why the sky is blue.",
@@ -21,12 +22,14 @@ prompts = ["Explain in three sentences why the sky is blue.",
            "What are the main causes of the French Revolution? Answer briefly.",
            "Translate into French: The train leaves at seven in the morning.",
            "Give me a haiku about an old lighthouse."]
-ids = [tok.apply_chat_template([{"role": "user", "content": p}], add_generation_prompt=True, return_tensors="pt").to(0)
+ids = [tok.apply_chat_template([{"role": "user", "content": p}], add_generation_prompt=True, return_tensors="pt")
        for p in prompts]
+ids = [(x["input_ids"] if hasattr(x, "keys") else x).to(0) for x in ids]   # transformers 5 returns a dict
 with torch.no_grad():
     seqs = [model.generate(input_ids=x, max_new_tokens=48, do_sample=False) for x in ids]
     run = lambda: [model(input_ids=s).logits.float() for s in seqs]
-    t0 = time.time(); ref = run(); t32 = time.time() - t0
+    ref = run()                                 # warm-up, then timed the same way as float16 + plan
+    torch.cuda.synchronize(); t0 = time.time(); run(); torch.cuda.synchronize(); t32 = time.time() - t0
     with Recorder(model) as r32:
         run()
     model.half()
