@@ -4,7 +4,8 @@ plain float16, and float16 with the plan applied (relative error of the encoder 
 Hand fix for comparison (volta-ace-step README): relative error 0.2-7% (2B), 0.2-2.4% (XL) for the float32 tail."""
 CWD = __import__("os").getcwd()
 import copy, json, os, sys
-ROOT = os.environ.get("ACESTEP_ROOT", "/mnt/steam/ace-step/ACE-Step-1.5"); HERE = os.path.dirname(os.path.abspath(__file__))
+from env import need
+ROOT = need("ACESTEP_ROOT"); HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path[:0] = [os.path.join(HERE, ".."), HERE, ROOT]; os.chdir(ROOT)
 import torch
 from transformers import AutoModel, AutoTokenizer

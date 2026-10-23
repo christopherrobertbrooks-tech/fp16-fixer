@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fp16fix"
+version = "0.2.0"
+description = "Find where a model's numbers leave float16's range and plan exact fixes (for GPUs without bfloat16)"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = ["torch>=2.4"]     # nn.RMSNorm
+
+[project.optional-dependencies]
+drivers = ["transformers>=4.57"]   # the shipped runs: 4.57 (ACE-Step), 5.18 (umT5 plan); see the README
+test = ["pytest>=7"]
+
+[project.urls]
+Homepage = "https://github.com/christopherrobertbrooks-tech/fp16-fixer"
+
+[tool.setuptools]
+packages = ["fp16fix"]
+
+[tool.pytest.ini_options]
+pythonpath = [".", "tests"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 130
+[tool.ruff.lint]
+select = ["E9", "F63", "F7", "F82"]   # syntax errors and undefined names

@@ -3,7 +3,8 @@
 pr-drafts/D-nanovllm-fp16.md -- residual stream ~2,000,000 from layer 2 at <|im_start|>; SwiGLU product into layer 2's
 down_proj ~85,000; layer 27's MLP output ~68,000)."""
 import os, sys
-CWD = __import__("os").getcwd(); ROOT = os.environ.get("ACESTEP_ROOT", "/mnt/steam/ace-step/ACE-Step-1.5"); HERE = os.path.dirname(os.path.abspath(__file__))
+from env import need
+CWD = __import__("os").getcwd(); ROOT = need("ACESTEP_ROOT"); HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path[:0] = [os.path.join(HERE, ".."), HERE]; os.chdir(ROOT)
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer

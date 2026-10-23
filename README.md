@@ -1,14 +1,28 @@
 # fp16-fixer
 
-Old GPUs without bfloat16 (V100, T4, P40, GTX 10-series) run models in float16, whose largest number is 65,504. Many
-models overflow it somewhere and come out as NaN. Every fix so far has been made by hand, one model at a time. This
-project automates the rule those fixes follow: find where the numbers leave float16's range, then pick an exact
-power-of-two rescaling across a scale-free boundary (a norm, a softmax with its scale folded in), or a float32 island
-where no such boundary exists.
+Old GPUs without bfloat16 run models in float16, whose largest number is 65,504. Many models overflow it somewhere and
+come out as NaN. Every fix so far has been made by hand, one model at a time. This project automates the rule those
+fixes follow: find where the numbers leave float16's range, then pick a power-of-two rescaling across a scale-free
+boundary (a norm, a softmax with its scale folded in) -- exact up to float16 rounding -- or a float32 island where no
+such boundary exists.
+
+**Tested on a Tesla V100 only.** It is meant for any GPU without bfloat16 (T4, P40, GTX 10-series) but hasn't been run
+on one. On Pascal cards (P40, GTX 1070/1080) float16 arithmetic runs at about 1/64 of the float32 rate and there are no
+tensor cores, so a plan there mainly saves memory (float16 weights and activations), not time -- measure before
+switching from float32. The speed-ups below are V100 numbers.
 
 **Status (2026-10-20): all four steps work on ACE-Step 1.5 and its 5 Hz LMs** -- find, plan, apply as run-time hooks,
 check against float32 -- including a model nobody had fixed by hand (the 4B LM), **and on two models outside
 ACE-Step: Wan 2.2's umT5-XXL text encoder and Gemma 3 4B.**
+
+## Install
+
+```bash
+pip install git+https://github.com/christopherrobertbrooks-tech/fp16-fixer
+```
+
+or, from a clone, `pip install -e ".[test]"` and run the tests with `pytest`. Needs Python 3.10+ and PyTorch 2.4+; the
+drivers also need transformers (`pip install -e ".[drivers]"`).
 
 ## Use
 
@@ -25,16 +39,24 @@ with torch.no_grad():
     with Recorder(model) as r16:          #    and the same inputs in plain float16
         run(model)
     plan = Plan(r32, r16)                 # 2. the fixes (print(plan.describe()) to read them)
-    save_fixes(plan.fixes, "plan.json")
+    save_fixes(plan.fixes, "plan.json", model=model)
 
 # later, at load time: the float16 model and the saved plan
-with torch.no_grad(), Applied(model, load_fixes("plan.json")):   # 3. hooks on, no weight changed
+fixes = load_fixes("plan.json", model=model)                     # warns if made for another model / attention
+with torch.no_grad(), Applied(model, fixes):                     # 3. hooks on, no weight changed
     out = run(model)
 ```
 
-Needs PyTorch 2.x (tested with 2.10). The drivers in `drivers/` are the runs below; they read model locations from
-`ACESTEP_ROOT`, `WAN_MODEL` and `GEMMA_MODEL`. A plan is only as good as its calibration inputs: values that only
-appear for other inputs are not covered, so calibrate on inputs like the ones you will run.
+A plan names operations by module path and position, so **make it and use it with the same model code and the same
+attention implementation** (all the runs below load with `attn_implementation="eager"`; a plan made on eager attention
+doesn't fit SDPA). `Applied` checks this: the first time a module runs, every planned place inside it must have been
+met, or it raises (`Applied(model, fixes, strict=False)` warns instead). A plan is also only as good as its
+calibration inputs: values that only appear for other inputs are not covered, so calibrate on inputs like the ones you
+will run.
+
+Versions behind the results: the ACE-Step runs used torch 2.10 and transformers 4.57; the umT5 plan and Gemma, torch 2.8
+and transformers 5.18. The drivers in `drivers/` are the runs below; they need the model locations in `ACESTEP_ROOT`,
+`WAN_MODEL` and `GEMMA_MODEL`.
 
 ## Step 1: find (`fp16fix/find.py`)
 
@@ -43,7 +65,7 @@ One float32 pass and one plain float16 pass over the same inputs, recorded by:
   projection's input), and a per-thread stack of running modules, so each operation is credited to its module;
 - a `TorchFunctionMode`, one per thread (pipelines run models in worker threads): every torch function that returns a
   floating tensor -- attention scores, in-between products, residual adds -- without knowing the model's code;
-  `scaled_dot_product_attention`'s scores are computed on the side.
+  `scaled_dot_product_attention`'s scores (after its scale) are computed on the side.
 
 The float32 pass gives the magnitudes; the float16 pass says which steps really run in float16 (a norm that upcasts
 itself can't overflow) and where the first inf / NaN appears. Reported: everything above 65,504 / 4 that runs in
@@ -56,11 +78,11 @@ Tesla V100, stock ACE-Step 1.5 code (the hand fixes switched off), the real pipe
 | model / site | hand-measured | found by fp16fix | hand fix |
 | --- | ---: | ---: | --- |
 | lyric encoder, `layers.7.mlp.down_proj` (turbo, xl-sft; standalone and in the pipeline) | ~505,000 | **504,584-504,864** | that projection in float32 |
-| DiT residual stream, xl-sft, 50 steps, CFG 7 (30 s cut of example 10) | 1.36M at layer 18 (3:48 song) | **1,150,339 at `decoder.layers.18`** | stream / 64, exact |
-| XL self-attention scores, `decoder.layers.0` | ~128,000 | **128,144** (`op:matmul`) | fold 1/sqrt(d) into `q_norm` |
+| DiT residual stream, xl-sft, 50 steps, CFG 7 (30 s cut of example 10) | 1.36M at layer 18 (3:48 song) | **1.15-1.17M at `decoder.layers.18`** (three runs: 1,150,339 / 1,153,176 / 1,166,330) | stream / 64, exact |
+| XL self-attention scores, `decoder.layers.0` | ~128,000 | **128,144** (`op:matmul`; 128,143.5 in the files) | fold 1/sqrt(d) into `q_norm` |
 | 5 Hz LM 1.7B residual stream ("massive activation") | ~2,000,000 from layer 2 | **1,958,926**, 26 layers from layer 2 | float32 residual |
 | 5 Hz LM 1.7B SwiGLU product into layer 2's `down_proj` | ~85,000 | **80,024** (`down_proj` input) | `up` / 128 |
-| control: 2B turbo DiT (stays in range) | in range | stream 24,026 (a within-4x warning, not an overflow); no attention site | -- |
+| control: 2B turbo DiT (stays in range) | in range | stream 23,898-24,026 (two runs; a within-4x warning, not an overflow); no attention site | -- |
 | *not in the hand list:* 5 Hz LM 4B | -- | stream 802,706 from layer 16; product 43,630 | -- |
 
 Plain float16 breaks first where the hand fixes say: the lyric encoder's `layers.7` (all song models), the LM's layer 2
@@ -70,14 +92,22 @@ Plain float16 breaks first where the hand fixes say: the lyric encoder's `layers
 
 The recorder also keeps a data-flow map (which operation produced each input; plain numbers an operation multiplies
 by). The planner's one move is *shrink it where it still fits*: an over-range value is divided by a power of two at an
-earlier point that still fits, walking back through steps that are proportional in that input (a linear layer, a
-product in one factor, a sum in both, a multiply by a plain number). The rules, in order:
+earlier point that still fits, walking back through steps that are proportional in that input (a linear layer without
+a bias, a product in one factor, a sum in both, a multiply by a plain number). Every value on the way changes, so each
+may only be read by the walk itself; a value with another reader (a SwiGLU norm output that feeds gate and up, an `up`
+read twice) stops the walk. The rules, in order:
 
-1. **Residual stream** (adds that feed each other): if only norms read it, divide the whole stream by 2^k -- shrink
-   every writer, divide the reading norms' epsilon by 4^k. Exact. Otherwise keep the stream in float32.
-2. **Attention scores**: move the scale that follows q @ k^T onto the q side (back to `q_norm` / `q_proj`).
-3. **Product into a projection**: shrink it where it fits, multiply back in float32 after the next linear layer.
-4. Otherwise a float32 island.
+1. **Residual stream** (adds that feed each other): if only scale-free norms read it (RMSNorm, LayerNorm, GroupNorm,
+   with an eps attribute -- not BatchNorm, whose running statistics aren't scale-free), divide the whole stream by
+   2^k -- shrink every writer, divide the reading norms' epsilon by 4^k. Exact up to float16 rounding. Otherwise
+   (another layer reads it, or the model returns it) keep the stream in float32.
+2. **Attention scores**: move the scale that follows q @ k^T onto the q side (back to `q_norm` / `q_proj`). Inside
+   `F.scaled_dot_product_attention` the scale can't be moved, so over-range scores there make the attention module a
+   float32 island.
+3. **Product into a projection**: shrink it where it fits, multiply back in float32 after the next linear layer (only
+   when every reader is a linear layer without a bias).
+4. Otherwise a float32 island. A model input or buffer that is over range itself can't be fixed by a plan; it is
+   listed as NOT COVERED.
 
 | model | hand fix | plan (headroom 4x) |
 | --- | --- | --- |
@@ -96,13 +126,15 @@ Same rules and places as the hand fixes; the factors differ only by the headroom
 operation at run time and multiplies its output (or moves the attention scale, or divides a norm's epsilon, or runs an
 island in float32). No weight is changed; leaving the `with` block restores the model.
 
-Tesla V100, plain float16 vs float16 with the plan vs the hand-made fixes, all against float32:
+Tesla V100, plain float16 vs float16 with the plan vs the hand-made fixes, all against float32. **These are on the
+calibration inputs** (the plan was made from the same songs / prompts); the held-out check is the umT5 plan in
+[plans/wan22-umt5-xxl](plans/wan22-umt5-xxl): 12 unseen prompts, 0.20% median / 1.0% worst error.
 
 | model | plain float16 | float16 + fp16fix plan | float16 + hand fixes |
 | --- | --- | --- | --- |
 | lyric encoder, turbo (8 songs, output vs float32) | NaN on all 8 | all 8 finite, rel. error 0.3-2.4% | (README) 0.2-7% |
 | lyric encoder, xl-sft (8 songs) | NaN on all 8 | all 8 finite, 0.2-7.1% | (README) 0.2-2.4% |
-| 5 Hz LM 1.7B (3 prompts, 48-token float32 greedy continuations, teacher-forced) | NaN | top-1 agreement 100 / 98 / 96% | (PR draft) 100 / 80 / 100% (bf16: 98 / 60 / 95%) |
+| 5 Hz LM 1.7B (3 prompts, 48-token float32 greedy continuations, teacher-forced) | NaN | top-1 agreement 100 / 98 / 96%, logits 15.4 / 3.9 / 3.1% off | (PR draft) 100 / 80 / 100% (bf16: 98 / 60 / 95%) |
 | **5 Hz LM 4B** (no hand fix exists) | NaN | **top-1 98 / 100 / 100%, logits 0.09% off** | -- |
 | song, turbo, 8 steps (30 s, seed fixed) | NaN latents | wave corr 0.994, log-mel corr 0.997 | 0.999 / 0.997 |
 | song, xl-sft, 50 steps, CFG 7 | NaN latents | wave corr 0.863, log-mel corr 0.988 | 0.816 / 0.986 |
@@ -118,8 +150,9 @@ close to float32.
 
 ## An unseen model: Wan 2.2's umT5-XXL text encoder (`drivers/check_umt5.py`)
 
-Studio-style encoding (padded to 512), 6 video prompts + Wan's default negative prompt, V100. In float16 transformers
-clamps over-range values to +-65,504, so plain float16 doesn't NaN -- it silently clips.
+Studio-style encoding (padded to 512), 6 video prompts + Wan's default negative prompt, V100, calibration inputs
+(held out: [plans/wan22-umt5-xxl](plans/wan22-umt5-xxl)). In float16 transformers clamps over-range values to
++-65,504, so plain float16 doesn't NaN -- it silently clips.
 
 | | rel. error vs float32 | cosine | 7 prompts | peak memory |
 | --- | ---: | ---: | ---: | ---: |
@@ -136,18 +169,19 @@ float16 matmuls), reached here by the rules.
 ## Gemma 3 4B-it (`drivers/check_gemma.py`)
 
 Gemma 3 is known to fail in float16: its embeddings are multiplied by sqrt(hidden_size) and its post-norm weights are
-large ([transformers RFC #37226](https://github.com/huggingface/transformers/pull/37226) scaled the embedding and the
-`post_*_layernorm` weights down by about sqrt(hidden_size); the pre-norms and the final norm make that exact).
+large ([transformers RFC #37226](https://github.com/huggingface/transformers/pull/37226), closed without merging,
+proposed scaling the embedding and the `post_*_layernorm` weights down by about sqrt(hidden_size); the pre-norms and
+the final norm make that exact).
 
 fp16fix's plan, from the measurements alone: **one fix -- the residual stream / 32, shrunk at the embedding's
 sqrt(hidden) multiply and at every `post_attention_layernorm` / `post_feedforward_layernorm` output, the pre-norms'
-epsilon / 1024.** The RFC's fix, with a power-of-two factor (peak 299,939 needs / 32 for 4x headroom).
+epsilon / 1024.** The RFC's proposal, with a power-of-two factor (peak 299,939 needs / 32 for 4x headroom).
 
-| 5 prompts x 48 greedy tokens, teacher-forced | plain float16 | float16 + plan |
+| 5 prompts x 48 greedy tokens, teacher-forced (calibration inputs) | plain float16 | float16 + plan |
 | --- | --- | --- |
 | top-1 agreement with float32 | NaN on all 5 | **100% on all 5** |
-| logits relative error | -- | 0.14% - 0.17% |
-| 5 passes, V100 (float32: 0.36 s) | -- | 0.22 s |
+| logits relative error | -- | 0.13% - 0.19% |
+| 5 passes, V100 (float32: 0.40 s, both warmed up) | -- | 0.24 s |
 
 Weights: Unsloth's ungated copy (`unsloth/gemma-3-4b-it`, the Gemma licence applies), text only.
 
@@ -162,10 +196,16 @@ decoding); a plan is made per model from one calibration set (the 8 example song
 
 ## Tests
 
-`tests/test_find.py` (9), `tests/test_plan.py` (5, the planner on toy models with known answers) and
-`tests/test_apply.py` (5: plain float16 gives NaN, float16 with the plan is finite and within 2% of float32, hooks and
-epsilons restored). `test_find.py`: a toy model with planted sites -- a SwiGLU product, q.k scores (eager and SDPA), a residual
-stream -- must be found and clean blocks must stay quiet; masks aren't overflows; hooks are removed; operations are seen
-when the model runs in another thread. Disabling the `Linear` input hooks or the function mode makes them fail.
+`pytest` (CPU, a few seconds; CI runs it on every push). `tests/test_find.py` (9): a toy model with planted sites -- a
+SwiGLU product, q.k scores (eager and SDPA), a residual stream -- must be found and clean blocks must stay quiet; masks
+aren't overflows; hooks are removed; operations are seen when the model runs in another thread. Disabling the `Linear`
+input hooks or the function mode makes them fail. `tests/test_plan.py` (5): the planner on toy models with known
+answers. `tests/test_apply.py` (5): plain float16 gives NaN, float16 with the plan is finite and within 2% of float32,
+hooks and epsilons restored.
+
+`tests/test_exact.py` (16): applying a plan to the float32 model itself must leave the output unchanged (to 1e-6),
+on toys made to break each rule -- a shrink point with a second reader, biased linear layers, a BatchNorm reader,
+LayerNorm / GroupNorm readers, a norm without an eps attribute, a model that returns its raw stream, a GELU MLP, a
+module called twice, attention inside SDPA -- plus a plan applied to a changed model (eager -> SDPA) must raise.
 
 Made with AI assistance (Claude). MIT licence.
