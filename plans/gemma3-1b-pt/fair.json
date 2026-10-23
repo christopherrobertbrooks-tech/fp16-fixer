@@ -1,0 +1,89 @@
+{
+ "model": "unsloth/gemma-3-1b-pt",
+ "transformers": "5.18.0",
+ "torch": "2.8.0+cu126",
+ "gpu": "Tesla V100-PCIE-32GB",
+ "wiki_tokens": 40960,
+ "reps": 5,
+ "results": {
+  "fp32": {
+   "ppl": 19.81758721506617,
+   "time_teacher_forced": {
+    "median": 0.29159069061279297,
+    "min": 0.29137182235717773
+   },
+   "time_decode_48": {
+    "median": 0.543489933013916,
+    "min": 0.5432229042053223
+   }
+  },
+  "rfc_1/8": {
+   "held_out_top1": 0.996527781089147,
+   "held_out_rel_err_median": 0.0009022333542816341,
+   "held_out_rel_err_max": 0.0012498449068516493,
+   "free_run_all_48_same": 10,
+   "free_run_same_tokens_mean": 44.75,
+   "ppl": 19.820329391300604,
+   "kl_mean": 8.070080050377436e-05,
+   "time_teacher_forced": {
+    "median": 0.20614409446716309,
+    "min": 0.2061009407043457
+   },
+   "time_decode_48": {
+    "median": 0.597592830657959,
+    "min": 0.5951893329620361
+   }
+  },
+  "rfc_1/34": {
+   "held_out_top1": 0.9982638905445734,
+   "held_out_rel_err_median": 0.0013893942814320326,
+   "held_out_rel_err_max": 0.0025971620343625546,
+   "free_run_all_48_same": 11,
+   "free_run_same_tokens_mean": 45.833333333333336,
+   "ppl": 19.82362120145728,
+   "kl_mean": 0.0002635403313671302,
+   "time_teacher_forced": {
+    "median": 0.20747065544128418,
+    "min": 0.2069532871246338
+   },
+   "time_decode_48": {
+    "median": 0.5958030223846436,
+    "min": 0.5944862365722656
+   }
+  },
+  "rfc_1/64": {
+   "held_out_top1": 0.9947916716337204,
+   "held_out_rel_err_median": 0.00211435672827065,
+   "held_out_rel_err_max": 0.0041650147177278996,
+   "free_run_all_48_same": 8,
+   "free_run_same_tokens_mean": 41.75,
+   "ppl": 19.81405027883312,
+   "kl_mean": 0.0005969923286391959,
+   "time_teacher_forced": {
+    "median": 0.2088794708251953,
+    "min": 0.20743775367736816
+   },
+   "time_decode_48": {
+    "median": 0.6017653942108154,
+    "min": 0.5925040245056152
+   }
+  },
+  "plan": {
+   "held_out_top1": 0.996527781089147,
+   "held_out_rel_err_median": 0.0008736248128116131,
+   "held_out_rel_err_max": 0.0012119929306209087,
+   "free_run_all_48_same": 10,
+   "free_run_same_tokens_mean": 44.75,
+   "ppl": 19.822069573113733,
+   "kl_mean": 6.883753957964283e-05,
+   "time_teacher_forced": {
+    "median": 0.3152146339416504,
+    "min": 0.3137972354888916
+   },
+   "time_decode_48": {
+    "median": 1.1532819271087646,
+    "min": 1.1502552032470703
+   }
+  }
+ }
+}
