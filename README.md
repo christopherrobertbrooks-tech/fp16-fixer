@@ -188,6 +188,15 @@ Weights: Unsloth's ungated copy (`unsloth/gemma-3-4b-it`, the Gemma licence appl
 A ready-made plan for Wan 2.2's umT5-XXL, calibrated and checked on held-out prompts:
 [plans/wan22-umt5-xxl](plans/wan22-umt5-xxl).
 
+## Validation sweep ([#11](https://github.com/christopherrobertbrooks-tech/fp16-fixer/issues/11))
+
+Models with a documented float16 failure, each scored on held-out prompts against float32 and, where one exists,
+against the published fix. Tesla V100.
+
+| model | plain float16 | float16 + plan (held out) | published fix (held out) | plan |
+| --- | --- | --- | --- | --- |
+| Gemma 3 1B base | NaN 12/12 | top-1 99.65%, logits 0.087% median / 0.12% worst, 10/12 greedy runs identical | RFC #37226 (x 1/64): 99.48%, 0.21% / 0.42%, 8/12 | [stream / 8](plans/gemma3-1b-pt) |
+
 Not tried: MiniMax H3 itself (its smallest 16-bit setup is ~95 GB of weights, beyond a 32 GB V100 with 16 GB of RAM).
 
 Limits: tried on three model families (ACE-Step 1.5 + its Qwen3-based LMs, umT5, Gemma 3); the hooks run every operation through a

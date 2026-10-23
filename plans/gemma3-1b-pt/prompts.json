@@ -1,0 +1,38 @@
+{
+ "calibration": [
+  "Once upon a time, in a village at the edge of a great forest,",
+  "The three laws of thermodynamics can be summarised as follows:",
+  "def merge_sort(items):\n    \"\"\"Sort a list with merge sort.\"\"\"\n",
+  "The capital of Australia is",
+  "Ingredients for a simple tomato soup:\n1.",
+  "In 1969, the Apollo 11 mission",
+  "La Révolution française a commencé en",
+  "Dear hiring manager,\n\nI am writing to apply for",
+  "Q: What is 17 multiplied by 23?\nA:",
+  "The main difference between a virus and a bacterium is",
+  "SELECT customer_id, COUNT(*) AS orders\nFROM orders\n",
+  "Photosynthesis is the process by which plants",
+  "Der schnellste Weg von Berlin nach München ist",
+  "Top five tips for a beginner gardener:\n-",
+  "The stock market fell sharply on Monday after",
+  "<html>\n<head>\n  <title>My first page</title>\n",
+  "人工智能的发展历史可以追溯到",
+  "A haiku about the ocean:\n",
+  "The mitochondria is often called the powerhouse of the cell because",
+  "To install the package, first open a terminal and run"
+ ],
+ "held_out": [
+  "The old lighthouse keeper climbed the stairs one last time and",
+  "Newton's second law states that",
+  "import numpy as np\n\ndef moving_average(x, n):\n",
+  "The largest planet in our solar system is",
+  "How to make a paper airplane:\nStep 1:",
+  "During the Industrial Revolution, factories",
+  "El río más largo de Sudamérica es",
+  "Meeting notes, Tuesday:\n- Budget review",
+  "Q: If a train travels 120 km in 1.5 hours, what is its average speed?\nA:",
+  "Vaccines work by training the immune system to",
+  "#!/bin/bash\n# Back up the home directory every night\n",
+  "東京は日本の首都で、"
+ ]
+}

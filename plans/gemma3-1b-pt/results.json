@@ -1,0 +1,274 @@
+{
+ "model": "unsloth/gemma-3-1b-pt",
+ "transformers": "5.18.0",
+ "torch": "2.8.0+cu126",
+ "gpu": "Tesla V100-PCIE-32GB",
+ "calibration_prompts": 20,
+ "new_tokens": 48,
+ "rfc_scale": 0.015625,
+ "held_out_summary": {
+  "plain_fp16": {
+   "n": 12,
+   "finite": 0,
+   "top1_mean": null,
+   "rel_err_median": null,
+   "rel_err_max": null,
+   "free_run_all_48_same": 0,
+   "free_run_same_tokens_mean": 0.0
+  },
+  "plan_fp16": {
+   "n": 12,
+   "finite": 12,
+   "top1_mean": 0.996527781089147,
+   "rel_err_median": 0.0008736248128116131,
+   "rel_err_max": 0.0012119929306209087,
+   "free_run_all_48_same": 10,
+   "free_run_same_tokens_mean": 44.75
+  },
+  "rfc_fp16": {
+   "n": 12,
+   "finite": 12,
+   "top1_mean": 0.9947916716337204,
+   "rel_err_median": 0.00211435672827065,
+   "rel_err_max": 0.0041650147177278996,
+   "free_run_all_48_same": 8,
+   "free_run_same_tokens_mean": 41.75
+  }
+ },
+ "time_s_held_out_teacher_forced": {
+  "fp32": 0.29006433486938477,
+  "plan_fp16": 0.3204071521759033,
+  "rfc_fp16": 0.208970308303833
+ },
+ "held_out": [
+  {
+   "prompt": "The old lighthouse keeper climbed the stairs one last time and",
+   "plain_fp16": {
+    "finite": false,
+    "free_run_same_tokens": 0
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 0.9791666865348816,
+    "rel_err": 0.00085109518840909,
+    "free_run_same_tokens": 23
+   },
+   "rfc_fp16": {
+    "finite": true,
+    "top1": 0.9791666865348816,
+    "rel_err": 0.0015536739956587553,
+    "free_run_same_tokens": 23
+   }
+  },
+  {
+   "prompt": "Newton's second law states that",
+   "plain_fp16": {
+    "finite": false,
+    "free_run_same_tokens": 0
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0009010681533254683,
+    "free_run_same_tokens": 48
+   },
+   "rfc_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.00211435672827065,
+    "free_run_same_tokens": 34
+   }
+  },
+  {
+   "prompt": "import numpy as np\n\ndef moving_average(x, n):\n",
+   "plain_fp16": {
+    "finite": false,
+    "free_run_same_tokens": 0
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0011248115915805101,
+    "free_run_same_tokens": 48
+   },
+   "rfc_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0041650147177278996,
+    "free_run_same_tokens": 48
+   }
+  },
+  {
+   "prompt": "The largest planet in our solar system is",
+   "plain_fp16": {
+    "finite": false,
+    "free_run_same_tokens": 0
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 0.9791666865348816,
+    "rel_err": 0.0008736248128116131,
+    "free_run_same_tokens": 34
+   },
+   "rfc_fp16": {
+    "finite": true,
+    "top1": 0.9791666865348816,
+    "rel_err": 0.0018892090301960707,
+    "free_run_same_tokens": 34
+   }
+  },
+  {
+   "prompt": "How to make a paper airplane:\nStep 1:",
+   "plain_fp16": {
+    "finite": false,
+    "free_run_same_tokens": 0
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0008810120052658021,
+    "free_run_same_tokens": 48
+   },
+   "rfc_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0020736707374453545,
+    "free_run_same_tokens": 48
+   }
+  },
+  {
+   "prompt": "During the Industrial Revolution, factories",
+   "plain_fp16": {
+    "finite": false,
+    "free_run_same_tokens": 0
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0008708880632184446,
+    "free_run_same_tokens": 48
+   },
+   "rfc_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0016676111845299602,
+    "free_run_same_tokens": 48
+   }
+  },
+  {
+   "prompt": "El río más largo de Sudamérica es",
+   "plain_fp16": {
+    "finite": false,
+    "free_run_same_tokens": 0
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0009668335551396012,
+    "free_run_same_tokens": 48
+   },
+   "rfc_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0026119998656213284,
+    "free_run_same_tokens": 48
+   }
+  },
+  {
+   "prompt": "Meeting notes, Tuesday:\n- Budget review",
+   "plain_fp16": {
+    "finite": false,
+    "free_run_same_tokens": 0
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0008197732386179268,
+    "free_run_same_tokens": 48
+   },
+   "rfc_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0025503591168671846,
+    "free_run_same_tokens": 48
+   }
+  },
+  {
+   "prompt": "Q: If a train travels 120 km in 1.5 hours, what is its average speed?\nA:",
+   "plain_fp16": {
+    "finite": false,
+    "free_run_same_tokens": 0
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0012119929306209087,
+    "free_run_same_tokens": 48
+   },
+   "rfc_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0035190244670957327,
+    "free_run_same_tokens": 48
+   }
+  },
+  {
+   "prompt": "Vaccines work by training the immune system to",
+   "plain_fp16": {
+    "finite": false,
+    "free_run_same_tokens": 0
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0007970798178575933,
+    "free_run_same_tokens": 48
+   },
+   "rfc_fp16": {
+    "finite": true,
+    "top1": 0.9791666865348816,
+    "rel_err": 0.0014518420211970806,
+    "free_run_same_tokens": 26
+   }
+  },
+  {
+   "prompt": "#!/bin/bash\n# Back up the home directory every night\n",
+   "plain_fp16": {
+    "finite": false,
+    "free_run_same_tokens": 0
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0007783982437103987,
+    "free_run_same_tokens": 48
+   },
+   "rfc_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0018706467235460877,
+    "free_run_same_tokens": 48
+   }
+  },
+  {
+   "prompt": "東京は日本の首都で、",
+   "plain_fp16": {
+    "finite": false,
+    "free_run_same_tokens": 0
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0008518954273313284,
+    "free_run_same_tokens": 48
+   },
+   "rfc_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0031074383296072483,
+    "free_run_same_tokens": 48
+   }
+  }
+ ],
+ "plan": "43 operations above 16,376 that run in float16 -> 1 fix(es) (\"margin only\" = the peak fits float16 already; the fix only buys the requested headroom)\n- residual stream (52 adds, peak 98,223 at model.layers.22): divide by 8 -> shrink at: output of model.embed_tokens (mul, 1x); output of model.layers.N.post_attention_layernorm (mul, 26x); output of model.layers.N.post_feedforward_layernorm (mul, 26x); norms' eps / 64: model.layers.N.input_layernorm, model.layers.N.pre_feedforward_layernorm, model.norm"
+}
