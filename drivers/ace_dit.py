@@ -11,7 +11,8 @@ float16 and where the first inf / nan appears. Answer key (volta-ace-step README
 """
 CWD = __import__("os").getcwd()
 import json, os, sys
-ROOT = os.environ.get("ACESTEP_ROOT", "/mnt/steam/ace-step/ACE-Step-1.5"); HERE = os.path.dirname(os.path.abspath(__file__))
+from env import need
+ROOT = need("ACESTEP_ROOT"); HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path[:0] = [os.path.join(HERE, ".."), HERE, ROOT]; os.chdir(ROOT)
 import torch
 import acestep.core.generation.handler.init_service_loader as isl

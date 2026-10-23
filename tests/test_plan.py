@@ -1,8 +1,6 @@
 """The planner must pick the rule the hand-made fixes used, on toy models with one planted problem each."""
-import os, sys
 import torch
 import torch.nn as nn
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from fp16fix.find import Recorder
 from fp16fix.plan import Plan
 from test_find import Toy

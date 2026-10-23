@@ -6,7 +6,8 @@ Two kinds of observer run together:
   innermost module that ran it;
 - a TorchFunctionMode: every torch function and tensor method that returns a floating tensor (matmul, add, mul,
   softmax inputs, ...), so attention scores and in-between products are seen without knowing the model's code.
-  F.scaled_dot_product_attention never materialises its scores, so for it the scores q @ k^T are computed on the side.
+  F.scaled_dot_product_attention never materialises its scores, so for it the scaled scores q @ k^T * scale are
+  computed on the side ("op:sdpa_scores").
 
 Maxima are kept on the GPU (torch.maximum) and read once at the end, so recording costs no syncs.
 
@@ -14,7 +15,8 @@ With graph=True (the default) it also keeps a data-flow map for the planner: eve
 (module path, "op:<name>#<n>", n = its count of that op within one call of the module, so the two residual adds of a
 decoder layer are #0 and #1), with an edge from the node that produced each of its tensor inputs. Shape and dtype
 operations (view, transpose, to, cat, ...) pass their input's producer through. Plain numbers an operation multiplies
-or divides by are kept too (node_scalars), so an attention scale after q @ k^T can be found.
+or divides by are kept too (node_scalars), so an attention scale after q @ k^T can be found. Tensors the model
+returns get an edge to the OUTPUT node, so the planner knows the caller reads them.
 """
 import collections
 import re
@@ -25,6 +27,8 @@ import torch.nn.functional as F
 from torch.overrides import TorchFunctionMode
 
 FP16_MAX = 65504.0
+EPS_ATTRS = ("variance_epsilon", "eps", "epsilon")
+OUTPUT = ("<output>", "output")      # the graph node that stands for "returned from the model"
 _SKIP = {"size", "dim", "shape", "numel", "dtype", "device", "is_floating_point", "__get__", "__len__", "item", "tolist",
          "detach", "to", "float", "half", "bfloat16", "contiguous", "view", "reshape", "transpose", "permute", "expand",
          "unsqueeze", "squeeze", "flatten", "unflatten", "__getitem__", "split", "chunk", "narrow", "clone", "type_as",
@@ -56,6 +60,29 @@ def _first_tensor(o):
     return None
 
 
+def scale_free_eps(mod):
+    """The name of mod's epsilon attribute if mod is a norm that ignores its input's overall scale (RMSNorm, LayerNorm,
+    GroupNorm and the transformers *RMSNorm / *LayerNorm classes), else None. A norm with running statistics
+    (BatchNorm) is not scale-free; one without an eps attribute can't have its eps adjusted, so it doesn't count."""
+    if isinstance(mod, torch.nn.modules.batchnorm._BatchNorm) or getattr(mod, "running_mean", None) is not None:
+        return None
+    known = isinstance(mod, (torch.nn.RMSNorm, torch.nn.LayerNorm, torch.nn.GroupNorm))
+    if not (known or re.search(r"(RMS|Layer|Group)Norm", type(mod).__name__)):
+        return None
+    return next((a for a in EPS_ATTRS if hasattr(mod, a)), None)
+
+
+def _sdpa_scores(args, kwargs):
+    """The scaled scores q @ k^T * scale an F.scaled_dot_product_attention call computes (without its mask)."""
+    q, k = args[0], args[1]
+    scale = kwargs.get("scale", args[6] if len(args) > 6 else None)
+    if scale is None:
+        scale = q.shape[-1] ** -0.5
+    if q.dim() >= 3 and k.dim() == q.dim() and k.shape[-3] != q.shape[-3]:       # grouped-query attention
+        k = k.repeat_interleave(q.shape[-3] // k.shape[-3], dim=-3)
+    return (q.float() @ k.float().transpose(-2, -1)) * scale
+
+
 class Recorder:
     """with Recorder(model) as rec: model(...); then rec.report()."""
 
@@ -76,6 +103,9 @@ class Recorder:
         self.node_max, self.node_order, self.node_dtypes = {}, {}, {}   # node -> 0-d tensor / first seen / dtypes
         self.edges = set()                # (producer node, consumer node)
         self.node_scalars = {}            # node -> set of plain numbers in its arguments
+        self.biased = set()               # linear-op nodes called with a bias (not proportional in their input)
+        self.repeated = set()             # nodes with one producer's tensor in two arguments (x * x)
+        self.scale_free = {}              # module path -> eps attribute name, for scale-free norms (scale_free_eps)
         self._prod = {}                   # id(tensor) -> (weakref, node): who produced a live tensor
 
     # ---- recording -------------------------------------------------------------------------------------------
@@ -159,6 +189,11 @@ class Recorder:
     def _post(self, path):
         def f(mod, args, out):
             self._rec(path, "output", _first_tensor(out))
+            if path == "<root>" and self.graph:        # what the model returns is read by its caller
+                for t in _tensors(out if not hasattr(out, "to_tuple") else out.to_tuple()):
+                    src = self._producer(t)
+                    if src is not None:
+                        self.edges.add((src, OUTPUT))
             if self._stack and self._stack[-1] == path:
                 self._stack.pop()
                 if self._counters:
@@ -193,6 +228,7 @@ class Recorder:
                         cnt = rec._counters[-1] if rec._counters else collections.Counter()
                         node = (where, f"op:{name}#{cnt[name]}")
                         cnt[name] += 1
+                        srcs = []
                         for a in _tensors((args, kwargs)):
                             src = rec._producer(a)
                             if src is None and a.is_floating_point() and not isinstance(a, torch.nn.Parameter) and a.numel():
@@ -201,9 +237,14 @@ class Recorder:
                                 rec._rec_node(src, a)
                             if src is not None:
                                 rec.edges.add((src, node))
+                                srcs.append(src)
+                        if len(srcs) != len(set(srcs)):
+                            rec.repeated.add(node)
                         nums = [x for x in list(args) + list(kwargs.values()) if isinstance(x, (int, float)) and not isinstance(x, bool)]
                         if nums:
                             rec.node_scalars.setdefault(node, set()).update(float(x) for x in nums)
+                        if name == "linear" and (kwargs.get("bias") if len(args) < 3 else args[2]) is not None:
+                            rec.biased.add(node)
                         for o in _tensors(out):
                             rec._set_producer(o, node)
                         ft = _first_tensor(out)
@@ -212,14 +253,13 @@ class Recorder:
                     finally:
                         rec._busy = False
                 if func is F.scaled_dot_product_attention:
-                    q, k = args[0], args[1]
                     rec._busy = True
                     try:
                         with torch.no_grad():
-                            s = q.float() @ k.float().transpose(-2, -1)
+                            s = _sdpa_scores(args, kwargs)
                     finally:
                         rec._busy = False
-                    rec._rec(where, "op:sdpa_scores_unscaled", s)
+                    rec._rec(where, "op:sdpa_scores", s)
                 rec._rec(where, "op:" + name, _first_tensor(out))
                 return out
 
@@ -229,6 +269,9 @@ class Recorder:
         for name, mod in self.model.named_modules():
             path = name or "<root>"
             self.mtype[path] = type(mod).__name__
+            eps = scale_free_eps(mod)
+            if eps is not None:
+                self.scale_free[path] = eps
             lin = isinstance(mod, torch.nn.Linear)
             self._hooks.append(mod.register_forward_pre_hook(self._pre(path, lin)))
             self._hooks.append(mod.register_forward_hook(self._post(path)))

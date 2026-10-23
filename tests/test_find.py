@@ -1,9 +1,7 @@
 """The recorder must find planted overflow sites (and only those) in a toy model, run on the CPU in float32."""
-import os, sys
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from fp16fix.find import Recorder, summarize
 
 
@@ -87,8 +85,11 @@ def test_finds_planted_sites_and_nothing_else():
 
 def test_sdpa_scores_are_seen():
     torch.manual_seed(0)
-    rec, rows = run(Toy(sdpa=True).eval())
-    assert any(p == "layers.2.attn" and k == "op:sdpa_scores_unscaled" for _, p, _, k, _ in rows), rows
+    m = Toy(sdpa=True).eval()
+    with torch.no_grad():     # the scores are measured after SDPA's 1/sqrt(d) scale: plant a larger q . k^T
+        m.layers[2].attn.q.weight.normal_(0, 12.0); m.layers[2].attn.k.weight.normal_(0, 12.0)
+    rec, rows = run(m)
+    assert any(p == "layers.2.attn" and k == "op:sdpa_scores" for _, p, _, k, _ in rows), rows
 
 
 def test_stream_overflow_is_seen_at_block_level():

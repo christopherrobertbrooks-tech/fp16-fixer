@@ -1,7 +1,6 @@
 """Applying a plan must make float16 runs finite and close to float32, on the toy models (CPU)."""
-import copy, os, sys
+import copy
 import torch
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from fp16fix.find import Recorder
 from fp16fix.plan import Plan
 from fp16fix.apply import Applied

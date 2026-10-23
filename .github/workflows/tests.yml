@@ -1,0 +1,20 @@
+name: tests
+on: [push, pull_request]
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install (CPU torch)
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install ".[test]" ruff
+      - name: Import from the installed package
+        run: cd /tmp && python -c "from fp16fix import Recorder, Plan, Applied, save_fixes, load_fixes"
+      - name: Lint
+        run: ruff check .
+      - name: Tests
+        run: pytest -q

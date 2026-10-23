@@ -8,7 +8,8 @@ correlation and log-mel correlation; NaN / failure.
 """
 CWD = __import__("os").getcwd()
 import json, os, sys, time
-ROOT = os.environ.get("ACESTEP_ROOT", "/mnt/steam/ace-step/ACE-Step-1.5"); HERE = os.path.dirname(os.path.abspath(__file__))
+from env import need
+ROOT = need("ACESTEP_ROOT"); HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path[:0] = [os.path.join(HERE, ".."), HERE, ROOT]; os.chdir(ROOT)
 import torch, soundfile, torchaudio
 import acestep.core.generation.handler.init_service_loader as isl
