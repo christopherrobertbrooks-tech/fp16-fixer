@@ -3,7 +3,10 @@
 against float32 -- accuracy on held-out prompts and speed (teacher-forced passes and 48-token greedy decoding, each
 the median of 5 runs after a warm-up). The plan is loaded (--plan) or made from the calibration prompts.
 
-    check_bake_lm.py --model DIR --prompts prompts.json [--plan plan.json] --out OUT.json
+    check_bake_lm.py --model DIR --prompts prompts.json [--plan plan.json] --out OUT.json [--ref-dtype bfloat16] [--in-place]
+--ref-dtype bfloat16: the reference and the planner's magnitude pass in bfloat16 instead of float32 (bfloat16 has
+float32's range, so the peaks are right; for models whose float32 copy doesn't fit the GPU, e.g. a 12B on 32 GB).
+--in-place: bake the model itself after the Applied run instead of a copy (two float16 copies wouldn't fit).
 """
 import argparse, copy, json, os, sys, time
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path[:0] = [os.path.join(HERE, "..")]
@@ -17,10 +20,12 @@ NEW, REPS = 48, 5
 ap = argparse.ArgumentParser()
 ap.add_argument("--model", required=True); ap.add_argument("--prompts", required=True)
 ap.add_argument("--plan"); ap.add_argument("--out", required=True)
+ap.add_argument("--ref-dtype", default="float32", choices=["float32", "bfloat16"]); ap.add_argument("--in-place", action="store_true")
 a = ap.parse_args()
 P = json.load(open(a.prompts))
 tok = AutoTokenizer.from_pretrained(a.model)
-model = AutoModelForCausalLM.from_pretrained(a.model, dtype=torch.float32, attn_implementation="eager",
+REF = getattr(torch, a.ref_dtype)
+model = AutoModelForCausalLM.from_pretrained(a.model, dtype=REF, attn_implementation="eager",
                                              device_map={"": 0}).eval()
 model.generation_config.max_length = None
 
@@ -59,11 +64,11 @@ def compare(outs, gens, ref, seqs):
 ids = {p: tok(p, return_tensors="pt").input_ids.cuda() for p in P["calibration"] + P["held_out"]}
 held_ids = [ids[p] for p in P["held_out"]]
 res = {"model": os.path.basename(a.model.rstrip("/")), "transformers": transformers.__version__, "torch": torch.__version__,
-       "gpu": torch.cuda.get_device_name(), "reps": REPS, "time_s": {}}
+       "gpu": torch.cuda.get_device_name(), "reps": REPS, "reference": a.ref_dtype, "time_s": {}}
 with torch.no_grad():
     seqs = [greedy(model, x) for x in held_ids]
     ref = scores(model, seqs)
-    res["time_s"]["fp32"] = {"teacher_forced": reps(lambda: scores(model, seqs)), "decode_48": reps(lambda: greedy(model, held_ids[0]))}
+    res["time_s"][a.ref_dtype] = {"teacher_forced": reps(lambda: scores(model, seqs)), "decode_48": reps(lambda: greedy(model, held_ids[0]))}
     cal = [greedy(model, ids[p]) for p in P["calibration"]] if not a.plan else None
     if cal is not None:
         with Recorder(model) as r32:
@@ -79,7 +84,10 @@ with torch.no_grad():
     with Applied(model, fixes):
         out_a, gen_a = scores(model, seqs), [greedy(model, x) for x in held_ids]
         res["time_s"]["fp16_applied"] = {"teacher_forced": reps(lambda: scores(model, seqs)), "decode_48": reps(lambda: greedy(model, held_ids[0]))}
-    baked = copy.deepcopy(model)
+    if a.in_place:
+        baked = model                                     # the hooks are gone: the model is plain float16 again
+    else:
+        baked = copy.deepcopy(model)
     model = None                                          # free the GPU before baking the copy
     torch.cuda.empty_cache()
     t0 = time.time()
