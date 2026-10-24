@@ -10,9 +10,9 @@
  "steps": 8,
  "cfg": 1.0,
  "plan": "4 operations above 16,376 that run in float16 -> 2 fix(es) (\"margin only\" = the peak fits float16 already; the fix only buys the requested headroom)\n- residual stream (16 adds, peak 504,648 at encoder.lyric_encoder.layers.7): divide by 32 -> shrink at: output of encoder.lyric_encoder.embed_tokens (linear, 1x); output of encoder.lyric_encoder.layers.N.self_attn.o_proj (linear, 8x); output of encoder.lyric_encoder.layers.N.mlp.down_proj (linear, 7x); output of encoder.lyric_encoder.layers.N.mlp (mul, 1x); norms' eps / 1024: encoder.lyric_encoder.layers.N.input_layernorm, encoder.lyric_encoder.layers.N.post_attention_layernorm, encoder.lyric_encoder.norm\n  [margin only]\n- residual stream (72 adds, peak 27,114 at decoder.layers.23): divide by 2 -> shrink at: output of decoder.proj_in.N (conv1d, 1x); output of decoder.layers.N (mul, 24x); output of decoder.layers.N.cross_attn.o_proj (linear, 24x); output of decoder.layers.N.mlp.down_proj (linear, 1x); norms' eps / 4: decoder.layers.N.cross_attn_norm, decoder.layers.N.mlp_norm, decoder.layers.N.self_attn_norm, decoder.norm_out",
- "fp32_s": 2.225212335586548,
- "plan_s": 1.1454370021820068,
- "hand_s": 1.0837180614471436,
+ "fp32_s": 2.204925298690796,
+ "plan_s": 1.1125493049621582,
+ "hand_s": 1.0773839950561523,
  "fp32": {
   "ok": true,
   "rms": 0.13158485293388367,

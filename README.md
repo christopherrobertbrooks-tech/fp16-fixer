@@ -158,13 +158,14 @@ Studio-style encoding (padded to 512), 6 video prompts + Wan's default negative 
 | --- | ---: | ---: | ---: | ---: |
 | float32 | -- | -- | 3.29 s | 21.4 GB |
 | plain float16 (clamped) | 4% - 78% | 0.69 - 0.999 | 1.02 s | -- |
-| **float16 + fp16fix plan** | **0.16% - 0.37%** | **1.0000** | **1.15 s** | **10.9 GB** |
+| **float16 + fp16fix plan** | **0.24% - 0.61%** | **0.99998** | **1.15 s** | **10.9 GB** |
 
-The plan: the residual stream (peak 374,201) stays in float32, because its feed-forward writers can't be shrunk in
-time -- the gated-GELU's input reaches 250,000 in blocks 18-23, and nothing proportional sits between it and an
-earlier value that fits -- and those blocks' `act` / `wo` run as float32 islands. Everything else (attention, the other
-feed-forwards, all the norms) stays float16. This is the shape of the hand-made MiniMax H3 fix (float32 stream,
-float16 matmuls), reached here by the rules.
+The plan (current code, `results/check-umt5*.json`): the residual stream (peak 374,201) / 32, shrunk at the
+embedding and every attention / feed-forward output, plus float32 islands for the gated-GELU `act` of blocks 18-23
+(its input reaches ~250,000). Before the dropout fix in `fp16fix/find.py` (T5 calls one dropout module twice) the
+planner kept the stream in float32 instead: 0.16% - 0.37% here, at the same 1.15 s -- so for umT5 the float32 stream
+is the better plan, and it is the one shipped in [plans/wan22-umt5-xxl](plans/wan22-umt5-xxl). This is the shape of
+the hand-made MiniMax H3 fix (float32 stream, float16 matmuls).
 
 ## Gemma 3 4B-it (`drivers/check_gemma.py`)
 

@@ -1,14 +1,359 @@
 [
  {
-  "rule": "residual stream in float32",
-  "peak": 374201.15625,
+  "rule": "residual stream",
+  "peak": 374201.1875,
   "peak_at": [
    "encoder.block.23.layer.1",
    "op:add#0"
   ],
   "factor": 32,
-  "why": "a writer has no proportional path to a value that fits",
-  "readers": [
+  "shrink_at": [
+   [
+    "output",
+    [
+     "encoder.embed_tokens",
+     "op:embedding#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.0.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.0.layer.1.DenseReluDense.wo",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.1.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.1.layer.1.DenseReluDense.wo",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.2.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.2.layer.1.DenseReluDense.wo",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.3.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.3.layer.1.DenseReluDense.wo",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.4.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.4.layer.1.DenseReluDense.wo",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.5.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.5.layer.1.DenseReluDense.wo",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.6.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.6.layer.1.DenseReluDense.wo",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.7.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.7.layer.1.DenseReluDense.wo",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.8.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.8.layer.1.DenseReluDense.wo",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.9.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.9.layer.1.DenseReluDense.wo",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.10.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.10.layer.1.DenseReluDense.wo",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.11.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.11.layer.1.DenseReluDense.wo",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.12.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.12.layer.1.DenseReluDense.wo",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.13.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.13.layer.1.DenseReluDense.wo",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.14.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.14.layer.1.DenseReluDense.wo",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.15.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.15.layer.1.DenseReluDense.wo",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.16.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.16.layer.1.DenseReluDense.wo",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.17.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.17.layer.1.DenseReluDense.wo",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.18.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.18.layer.1.DenseReluDense",
+     "op:mul#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.19.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.19.layer.1.DenseReluDense",
+     "op:mul#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.20.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.20.layer.1.DenseReluDense",
+     "op:mul#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.21.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.21.layer.1.DenseReluDense",
+     "op:mul#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.22.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.22.layer.1.DenseReluDense",
+     "op:mul#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.23.layer.0.SelfAttention.o",
+     "op:linear#0"
+    ]
+   ],
+   [
+    "output",
+    [
+     "encoder.block.23.layer.1.DenseReluDense",
+     "op:mul#0"
+    ]
+   ]
+  ],
+  "norms_eps_divide_by": 1024,
+  "norms": [
    "encoder.block.0.layer.0.layer_norm",
    "encoder.block.0.layer.1.layer_norm",
    "encoder.block.1.layer.0.layer_norm",
@@ -58,178 +403,61 @@
    "encoder.block.9.layer.0.layer_norm",
    "encoder.block.9.layer.1.layer_norm",
    "encoder.final_layer_norm"
-  ],
-  "readers_keep_float32": [],
-  "first_value": []
+  ]
  },
  {
   "rule": "float32 island",
   "module": "encoder.block.18.layer.1.DenseReluDense.act",
-  "peak": 61221.046875,
+  "peak": 61221.03125,
   "site": [
    "encoder.block.18.layer.1.DenseReluDense.act",
    "op:pow#0"
   ],
-  "why": "no proportional path back to a value that fits"
- },
- {
-  "rule": "float32 island",
-  "module": "encoder.block.18.layer.1.DenseReluDense.wo",
-  "peak": 96145.6796875,
-  "site": [
-   "encoder.block.18.layer.1.DenseReluDense.wo",
-   "op:linear#0"
-  ],
-  "why": "no proportional path back to a value that fits"
- },
- {
-  "rule": "float32 island",
-  "module": "encoder.block.18.layer.1.dropout",
-  "peak": 96145.6796875,
-  "site": [
-   "encoder.block.18.layer.1.dropout",
-   "op:dropout#0"
-  ],
+  "keep_float32": false,
   "why": "no proportional path back to a value that fits"
  },
  {
   "rule": "float32 island",
   "module": "encoder.block.19.layer.1.DenseReluDense.act",
-  "peak": 250102.1875,
+  "peak": 250102.0,
   "site": [
    "encoder.block.19.layer.1.DenseReluDense.act",
    "op:pow#0"
   ],
-  "why": "no proportional path back to a value that fits"
- },
- {
-  "rule": "float32 island",
-  "module": "encoder.block.19.layer.1.DenseReluDense.wo",
-  "peak": 200364.828125,
-  "site": [
-   "encoder.block.19.layer.1.DenseReluDense.wo",
-   "op:linear#0"
-  ],
-  "why": "no proportional path back to a value that fits"
- },
- {
-  "rule": "float32 island",
-  "module": "encoder.block.19.layer.1.dropout",
-  "peak": 200364.828125,
-  "site": [
-   "encoder.block.19.layer.1.dropout",
-   "op:dropout#0"
-  ],
+  "keep_float32": false,
   "why": "no proportional path back to a value that fits"
  },
  {
   "rule": "float32 island",
   "module": "encoder.block.20.layer.1.DenseReluDense.act",
-  "peak": 36365.1328125,
+  "peak": 36365.12109375,
   "site": [
    "encoder.block.20.layer.1.DenseReluDense.act",
    "op:pow#0"
   ],
-  "why": "no proportional path back to a value that fits"
- },
- {
-  "rule": "float32 island",
-  "module": "encoder.block.20.layer.1.DenseReluDense.wo",
-  "peak": 118582.375,
-  "site": [
-   "encoder.block.20.layer.1.DenseReluDense.wo",
-   "op:linear#0"
-  ],
-  "why": "no proportional path back to a value that fits"
- },
- {
-  "rule": "float32 island",
-  "module": "encoder.block.20.layer.1.dropout",
-  "peak": 118582.375,
-  "site": [
-   "encoder.block.20.layer.1.dropout",
-   "op:dropout#0"
-  ],
-  "why": "no proportional path back to a value that fits"
- },
- {
-  "rule": "float32 island",
-  "module": "encoder.block.21.layer.1.DenseReluDense.wo",
-  "peak": 22741.333984375,
-  "site": [
-   "encoder.block.21.layer.1.DenseReluDense.wo",
-   "op:linear#0"
-  ],
-  "why": "no proportional path back to a value that fits"
- },
- {
-  "rule": "float32 island",
-  "module": "encoder.block.21.layer.1.dropout",
-  "peak": 22741.333984375,
-  "site": [
-   "encoder.block.21.layer.1.dropout",
-   "op:dropout#0"
-  ],
+  "keep_float32": false,
   "why": "no proportional path back to a value that fits"
  },
  {
   "rule": "float32 island",
   "module": "encoder.block.22.layer.1.DenseReluDense.act",
-  "peak": 176713.484375,
+  "peak": 176713.46875,
   "site": [
    "encoder.block.22.layer.1.DenseReluDense.act",
    "op:pow#0"
   ],
-  "why": "no proportional path back to a value that fits"
- },
- {
-  "rule": "float32 island",
-  "module": "encoder.block.22.layer.1.DenseReluDense.wo",
-  "peak": 77808.609375,
-  "site": [
-   "encoder.block.22.layer.1.DenseReluDense.wo",
-   "op:linear#0"
-  ],
-  "why": "no proportional path back to a value that fits"
- },
- {
-  "rule": "float32 island",
-  "module": "encoder.block.22.layer.1.dropout",
-  "peak": 77808.609375,
-  "site": [
-   "encoder.block.22.layer.1.dropout",
-   "op:dropout#0"
-  ],
+  "keep_float32": false,
   "why": "no proportional path back to a value that fits"
  },
  {
   "rule": "float32 island",
   "module": "encoder.block.23.layer.1.DenseReluDense.act",
-  "peak": 16627.63671875,
+  "peak": 16627.669921875,
   "site": [
    "encoder.block.23.layer.1.DenseReluDense.act",
    "op:pow#0"
   ],
-  "why": "no proportional path back to a value that fits"
- },
- {
-  "rule": "float32 island",
-  "module": "encoder.block.23.layer.1.DenseReluDense.wo",
-  "peak": 35766.75,
-  "site": [
-   "encoder.block.23.layer.1.DenseReluDense.wo",
-   "op:linear#0"
-  ],
-  "why": "no proportional path back to a value that fits"
- },
- {
-  "rule": "float32 island",
-  "module": "encoder.block.23.layer.1.dropout",
-  "peak": 35766.75,
-  "site": [
-   "encoder.block.23.layer.1.dropout",
-   "op:dropout#0"
-  ],
+  "keep_float32": false,
   "why": "no proportional path back to a value that fits"
  }
 ]

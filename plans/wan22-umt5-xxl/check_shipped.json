@@ -1,0 +1,59 @@
+{
+ "transformers": "5.18.0",
+ "torch": "2.8.0+cu126",
+ "gpu": "Tesla V100-PCIE-32GB",
+ "missed_planned_places": [],
+ "all_finite": true,
+ "rel_err_median": 0.00196295534260571,
+ "rel_err_max": 0.01024835929274559,
+ "per_prompt": [
+  {
+   "prompt": "A polar bear and her cub walk across sea ice under a pink arctic sky, breath visible in the cold air.",
+   "rel_err": 0.0010829175589606166
+  },
+  {
+   "prompt": "Close-up of rain drops hitting a puddle, each splash in slow motion, city lights blurred behind.",
+   "rel_err": 0.01024835929274559
+  },
+  {
+   "prompt": "A skateboarder does a kickflip at sunset in an empty parking lot, long shadows, slow motion replay.",
+   "rel_err": 0.0024534447584301233
+  },
+  {
+   "prompt": "古老的城墙上，灯笼在夜风中轻轻摇晃，远处烟花绽放，喜庆的节日气氛。",
+   "rel_err": 0.00196295534260571
+  },
+  {
+   "prompt": "Morning fog lifts over a vineyard in Tuscany, rows of grapevines, a farmhouse on the hill, birds take off.",
+   "rel_err": 0.001483448315411806
+  },
+  {
+   "prompt": "A blacksmith hammers a glowing piece of steel on an anvil, sparks fly, dark workshop lit by the forge.",
+   "rel_err": 0.001636090106330812
+  },
+  {
+   "prompt": "Top-down shot of a barista pouring latte art, a perfect rosetta forming in the cup.",
+   "rel_err": 0.0018905006581917405
+  },
+  {
+   "prompt": "Northern lights dance over a frozen lake in Norway, green and purple ribbons reflected on the ice, a lone cabin with warm windows.",
+   "rel_err": 0.0023182169534265995
+  },
+  {
+   "prompt": "Une vieille horloge de gare, les aiguilles tournent rapidement, des voyageurs passent en accéléré autour d'elle.",
+   "rel_err": 0.0021916937548667192
+  },
+  {
+   "prompt": "A giant tortoise slowly eats a hibiscus flower on a tropical island, extreme close-up, natural documentary narration feel.",
+   "rel_err": 0.009456170722842216
+  },
+  {
+   "prompt": "Fireflies light up a summer meadow at dusk while a girl in a white dress runs through the tall grass, dreamy, soft focus, magical realism, warm and nostalgic colour grading, gentle handheld camera following her.",
+   "rel_err": 0.0014470197493210435
+  },
+  {
+   "prompt": "worst quality, low quality, blurry, static, watermark, text, jpeg artifacts, deformed hands, extra fingers",
+   "rel_err": 0.0016263289144262671
+  }
+ ]
+}
