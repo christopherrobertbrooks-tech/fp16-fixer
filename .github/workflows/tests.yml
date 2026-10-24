@@ -13,7 +13,7 @@ jobs:
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install ".[test]" ruff
       - name: Import from the installed package
-        run: cd /tmp && python -c "from fp16fix import Recorder, Plan, Applied, save_fixes, load_fixes"
+        run: cd /tmp && python -c "from fp16fix import Recorder, Plan, Applied, bake, save_fixes, load_fixes"
       - name: Lint
         run: ruff check .
       - name: Tests

@@ -5,6 +5,8 @@ with the three hand-made fixes (re-enabled for that run) as the yardstick. Compa
 correlation and log-mel correlation; NaN / failure.
 
     check_dit.py CKPT STEPS CFG OUT.json
+With FP16FIX_BAKE=1 the plan is then baked into the weights (fp16fix.bake, issue #16) and the song made again with the
+baked model ("fp16-baked") instead of the hand-fix run (the hand fixes edit the model too).
 """
 CWD = __import__("os").getcwd()
 import json, os, sys, time
@@ -23,6 +25,7 @@ from fp16fix import Recorder
 from fp16fix.plan import Plan
 from fp16fix.apply import Applied
 ckpt, steps, cfg, out = sys.argv[1], int(sys.argv[2]), float(sys.argv[3]), os.path.join(CWD, sys.argv[4])
+BAKE = os.environ.get("FP16FIX_BAKE") == "1"
 ex = json.load(open("examples/text2music/example_10.json"))
 params = GenerationParams(task_type="text2music", thinking=False, caption=ex.get("caption") or ex.get("prompt", ""),
                           lyrics=ex.get("lyrics", ""), vocal_language=ex.get("language", "en"), duration=30,
@@ -68,9 +71,26 @@ with torch.no_grad():
     parts(torch.float16)
     with Applied(dit.model, plan.fixes):
         plan_path, tplan = gen("fp16-plan")
-    for n, f in HAND.items():                                # the yardstick: the hand-made fixes, as shipped
-        f(dit.model)
-    hand_path, thand = gen("fp16-hand")
+    baked_path, tbaked, bake_rep = None, float("nan"), None
+    if BAKE:
+        from fp16fix.bake import bake
+
+        def probe(m):                                        # one song; its first denoising step is the check value
+            FIRST.pop("probe", None)
+            gen("probe")
+            return FIRST["probe"]
+        bake_rep = bake(dit.model, plan.fixes, probe)
+        print(bake_rep.describe(), flush=True)
+        if bake_rep.leftover:
+            with Applied(dit.model, bake_rep.leftover):
+                baked_path, tbaked = gen("fp16-baked")
+        else:
+            baked_path, tbaked = gen("fp16-baked")
+        hand_path, thand = None, float("nan")
+    else:
+        for n, f in HAND.items():                            # the yardstick: the hand-made fixes, as shipped
+            f(dit.model)
+        hand_path, thand = gen("fp16-hand")
 
 mel = torchaudio.transforms.MelSpectrogram(sample_rate=48000, n_fft=2048, hop_length=512, n_mels=128)
 def load(p):
@@ -98,13 +118,18 @@ def song_corr(p, q):
     a, _ = load(p); b, _ = load(q); n = min(len(a), len(b))
     return torch.corrcoef(torch.stack([a[:n], b[:n]]))[0, 1].item()
 res = {"control_fp32_vs_fp32_wave_corr": song_corr(rec_path, ref_path), "plan_vs_hand_wave_corr": song_corr(plan_path, hand_path),
-       "first_step_rel_err": {k: step_err(k) for k in ("fp16-stock", "fp16-plan", "fp16-hand")},
+       "first_step_rel_err": {k: step_err(k) for k in ("fp16-stock", "fp16-plan", "fp16-hand", "fp16-baked")},
        "ckpt": ckpt, "steps": steps, "cfg": cfg, "plan": plan.describe(), "fp32_s": t32, "plan_s": tplan, "hand_s": thand,
        "fp32": compare(ref_path), "fp16_stock": compare(stock_path), "fp16_plan": compare(plan_path), "fp16_hand": compare(hand_path)}
-for k in ("fp16_stock", "fp16_plan", "fp16_hand"):
+if BAKE:
+    res.update(fp16_baked=compare(baked_path), baked_s=tbaked, baked_vs_plan_wave_corr=song_corr(baked_path, plan_path),
+               bake={"baked": [list(b) for b in bake_rep.baked], "leftover_rules": [f["rule"] for f in bake_rep.leftover],
+                     "check": bake_rep.check, "describe": bake_rep.describe()})
+for k in ("fp16_stock", "fp16_plan", "fp16_hand") + (("fp16_baked",) if BAKE else ()):
     print(k, json.dumps(res[k]))
 print("control: two float32 runs, waveform corr", round(res["control_fp32_vs_fp32_wave_corr"], 4),
       "| plan vs hand fixes (both float16), waveform corr", round(res["plan_vs_hand_wave_corr"], 4))
 print("first denoising step, relative error vs float32:", json.dumps(res["first_step_rel_err"]))
-print(f"time: float32 {t32:.1f} s, float16 + plan hooks {tplan:.1f} s, float16 + hand fixes {thand:.1f} s")
+print(f"time: float32 {t32:.1f} s, float16 + plan hooks {tplan:.1f} s, float16 + hand fixes {thand:.1f} s"
+      + (f", float16 baked {tbaked:.1f} s (baked vs plan waveform corr {res['baked_vs_plan_wave_corr']:.4f})" if BAKE else ""))
 json.dump(res, open(out, "w"), indent=1)
