@@ -10,7 +10,7 @@ writes plan.json, then on the "held_out" prompts compares with float32:
 - float16 + transformers' fix: from_pretrained(dtype=float16) (wo kept in float32, clamped);
 - float16 + plan: model.half() with the plan's hooks.
 Teacher-forced (the float32 output fed to the decoder: top-1 agreement, logits relative error) and free-running
-(greedy, up to 64 tokens: does the output equal float32's).
+(greedy, up to 64 tokens: does the output equal float32's). Timings: median of 5 runs after a warm-up.
 
     make_plan.py --model T5_DIR --out-dir DIR
 """
@@ -41,9 +41,12 @@ def logits(m, pairs):
     return [m(input_ids=x, decoder_input_ids=y[:, :-1]).logits.float() for x, y in pairs]
 
 
-def timed(f):
-    f(); torch.cuda.synchronize(); t = time.time(); f(); torch.cuda.synchronize()
-    return time.time() - t
+def timed(f, reps=5):
+    """Median of `reps` timed runs after one warm-up."""
+    f(); ts = []
+    for _ in range(reps):
+        torch.cuda.synchronize(); t = time.time(); f(); torch.cuda.synchronize(); ts.append(time.time() - t)
+    return sorted(ts)[reps // 2]
 
 
 ids = {p: tok(p, return_tensors="pt").input_ids.cuda() for p in P["calibration"] + P["held_out"]}

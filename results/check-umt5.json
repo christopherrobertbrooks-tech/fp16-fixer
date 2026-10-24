@@ -1,18 +1,18 @@
 {
- "plan": "28 operations above 16,376 that run in float16 -> 18 fix(es) (\"margin only\" = the peak fits float16 already; the fix only buys the requested headroom)\n- residual stream (48 adds, peak 374,201): keep in float32 (a writer has no proportional path to a value that fits)\n  [margin only]\n- float32 island: encoder.block.18.layer.1.DenseReluDense.act (peak 61,221; no proportional path back to a value that fits)\n- float32 island: encoder.block.18.layer.1.DenseReluDense.wo (peak 96,146; no proportional path back to a value that fits)\n- float32 island: encoder.block.18.layer.1.dropout (peak 96,146; no proportional path back to a value that fits)\n- float32 island: encoder.block.19.layer.1.DenseReluDense.act (peak 250,102; no proportional path back to a value that fits)\n- float32 island: encoder.block.19.layer.1.DenseReluDense.wo (peak 200,365; no proportional path back to a value that fits)\n- float32 island: encoder.block.19.layer.1.dropout (peak 200,365; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.20.layer.1.DenseReluDense.act (peak 36,365; no proportional path back to a value that fits)\n- float32 island: encoder.block.20.layer.1.DenseReluDense.wo (peak 118,582; no proportional path back to a value that fits)\n- float32 island: encoder.block.20.layer.1.dropout (peak 118,582; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.21.layer.1.DenseReluDense.wo (peak 22,741; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.21.layer.1.dropout (peak 22,741; no proportional path back to a value that fits)\n- float32 island: encoder.block.22.layer.1.DenseReluDense.act (peak 176,713; no proportional path back to a value that fits)\n- float32 island: encoder.block.22.layer.1.DenseReluDense.wo (peak 77,809; no proportional path back to a value that fits)\n- float32 island: encoder.block.22.layer.1.dropout (peak 77,809; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.23.layer.1.DenseReluDense.act (peak 16,628; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.23.layer.1.DenseReluDense.wo (peak 35,767; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.23.layer.1.dropout (peak 35,767; no proportional path back to a value that fits)",
+ "plan": "22 operations above 16,376 that run in float16 -> 6 fix(es) (\"margin only\" = the peak fits float16 already; the fix only buys the requested headroom)\n- residual stream (48 adds, peak 374,201 at encoder.block.23.layer.1): divide by 32 -> shrink at: output of encoder.embed_tokens (embedding, 1x); output of encoder.block.N.layer.N.SelfAttention.o (linear, 24x); output of encoder.block.N.layer.N.DenseReluDense.wo (linear, 18x); output of encoder.block.N.layer.N.DenseReluDense (mul, 6x); norms' eps / 1024: encoder.block.N.layer.N.layer_norm, encoder.final_layer_norm\n  [margin only]\n- float32 island: encoder.block.18.layer.1.DenseReluDense.act (peak 61,221; no proportional path back to a value that fits)\n- float32 island: encoder.block.19.layer.1.DenseReluDense.act (peak 250,102; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.20.layer.1.DenseReluDense.act (peak 36,365; no proportional path back to a value that fits)\n- float32 island: encoder.block.22.layer.1.DenseReluDense.act (peak 176,713; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.23.layer.1.DenseReluDense.act (peak 16,628; no proportional path back to a value that fits)",
  "rows": [
   {
    "prompt": "A small orange robot walks through a rai",
    "tokens": 26,
    "stock_fp16": {
     "finite": true,
-    "rel_err": 0.6085099577903748,
-    "cos": 0.8186954259872437
+    "rel_err": 0.6057185530662537,
+    "cos": 0.8203157186508179
    },
    "plan_fp16": {
     "finite": true,
-    "rel_err": 0.002882749307900667,
-    "cos": 0.9999977350234985
+    "rel_err": 0.002357143210247159,
+    "cos": 0.9999997615814209
    }
   },
   {
@@ -20,13 +20,13 @@
    "tokens": 24,
    "stock_fp16": {
     "finite": true,
-    "rel_err": 0.7811213135719299,
-    "cos": 0.7024592757225037
+    "rel_err": 0.7817010283470154,
+    "cos": 0.7016783952713013
    },
    "plan_fp16": {
     "finite": true,
-    "rel_err": 0.0035716586280614138,
-    "cos": 0.9999947547912598
+    "rel_err": 0.006094757001847029,
+    "cos": 0.9999825954437256
    }
   },
   {
@@ -34,13 +34,13 @@
    "tokens": 25,
    "stock_fp16": {
     "finite": true,
-    "rel_err": 0.7579565644264221,
-    "cos": 0.7319795489311218
+    "rel_err": 0.7561637759208679,
+    "cos": 0.7325476408004761
    },
    "plan_fp16": {
     "finite": true,
-    "rel_err": 0.003712833160534501,
-    "cos": 0.9999945759773254
+    "rel_err": 0.004095200914889574,
+    "cos": 0.9999931454658508
    }
   },
   {
@@ -48,13 +48,13 @@
    "tokens": 20,
    "stock_fp16": {
     "finite": true,
-    "rel_err": 0.039527855813503265,
-    "cos": 0.9992188215255737
+    "rel_err": 0.03938357159495354,
+    "cos": 0.9992246627807617
    },
    "plan_fp16": {
     "finite": true,
-    "rel_err": 0.00280348164960742,
-    "cos": 0.9999955892562866
+    "rel_err": 0.002855869708582759,
+    "cos": 0.9999957084655762
    }
   },
   {
@@ -62,13 +62,13 @@
    "tokens": 21,
    "stock_fp16": {
     "finite": true,
-    "rel_err": 0.4759984612464905,
-    "cos": 0.8923550248146057
+    "rel_err": 0.4719988703727722,
+    "cos": 0.894123911857605
    },
    "plan_fp16": {
     "finite": true,
-    "rel_err": 0.0016075954772531986,
-    "cos": 0.9999991655349731
+    "rel_err": 0.0024723808746784925,
+    "cos": 0.9999972581863403
    }
   },
   {
@@ -76,13 +76,13 @@
    "tokens": 31,
    "stock_fp16": {
     "finite": true,
-    "rel_err": 0.07381878048181534,
-    "cos": 0.9972715377807617
+    "rel_err": 0.07794755697250366,
+    "cos": 0.9969578981399536
    },
    "plan_fp16": {
     "finite": true,
-    "rel_err": 0.0020834142342209816,
-    "cos": 0.9999987483024597
+    "rel_err": 0.002497364766895771,
+    "cos": 0.9999970197677612
    }
   },
   {
@@ -90,23 +90,23 @@
    "tokens": 126,
    "stock_fp16": {
     "finite": true,
-    "rel_err": 0.7710446119308472,
-    "cos": 0.6911450028419495
+    "rel_err": 0.7719614505767822,
+    "cos": 0.6903738975524902
    },
    "plan_fp16": {
     "finite": true,
-    "rel_err": 0.001865814090706408,
-    "cos": 1.0000112056732178
+    "rel_err": 0.002514673862606287,
+    "cos": 1.0000098943710327
    }
   }
  ],
  "time_s": {
-  "fp32": 3.2852872212727866,
-  "fp16_plan": 1.1451644897460938,
-  "fp16_stock": 1.0151100953420003
+  "fp32": 3.294560273488363,
+  "fp16_plan": 1.1486714680989583,
+  "fp16_stock": 1.1262075106302898
  },
  "peak_gb": {
-  "fp32": 21.420988082885742,
-  "fp16_plan": 10.871829986572266
+  "fp32": 21.491569995880127,
+  "fp16_plan": 10.852170467376709
  }
 }

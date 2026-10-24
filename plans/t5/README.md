@@ -16,12 +16,12 @@ No float32 islands.
 
 12 held-out prompts vs float32, the decoder teacher-forced on float32's output (logits) and free-running (greedy):
 
-| | top-1 agreement | logits error, median / worst | same output as float32 | 12 teacher-forced passes |
+| | top-1 agreement | logits error, median / worst | same output as float32 | 12 teacher-forced passes (median of 5) |
 | --- | ---: | ---: | ---: | ---: |
-| float32 | -- | -- | -- | 0.18 s |
+| float32 | -- | -- | -- | 0.19 s |
 | plain float16 (clamped) | 97.2% | 0.69% / 3.6% | 11 / 12 | -- |
 | float16 + transformers' fix | 100% | **0.024% / 0.028%** | 12 / 12 | 0.19 s |
-| float16 + plan | 100% | 0.039% / 0.049% | 12 / 12 | **0.49 s** |
+| float16 + plan | 100% | 0.039% / 0.049% | 12 / 12 | **0.48 s** |
 
 **transformers' fix is better here**: closer to float32 (its `wo` runs in float32) and no slower than float32, while
 the plan's hooks make it 2.6x slower. t5-large is only mildly broken in float16 (one held-out output changes: an
