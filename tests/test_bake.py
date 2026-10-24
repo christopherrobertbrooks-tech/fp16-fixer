@@ -162,7 +162,8 @@ def test_tied_weights_are_not_scaled_twice():
 
 def test_bake_end_to_end_check_catches_a_leak():
     """Sabotage: allow edits to shared weights; the end-to-end check must refuse the result."""
-    import fp16fix.bake as B
+    import importlib
+    B = importlib.import_module("fp16fix.bake")          # the module (fp16fix.bake is also the function)
     torch.manual_seed(0)
     model = TiedHead().eval()
     with torch.no_grad():

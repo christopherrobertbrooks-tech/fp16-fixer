@@ -80,7 +80,7 @@ with torch.no_grad():
         out_a, gen_a = scores(model, seqs), [greedy(model, x) for x in held_ids]
         res["time_s"]["fp16_applied"] = {"teacher_forced": reps(lambda: scores(model, seqs)), "decode_48": reps(lambda: greedy(model, held_ids[0]))}
     baked = copy.deepcopy(model)
-    del model
+    model = None                                          # free the GPU before baking the copy
     torch.cuda.empty_cache()
     t0 = time.time()
     rep = bake(baked, fixes, lambda m: m(input_ids=seqs[0]))
