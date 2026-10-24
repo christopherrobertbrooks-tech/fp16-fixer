@@ -66,7 +66,7 @@ with torch.no_grad():
         res_out["plan_fp16"] = logits(model, held)
         gen["plan_fp16"] = [greedy(model, x) for x, _ in held]
         t_plan = timed(lambda: logits(model, held))
-    del model
+    model = None                                                          # free the GPU for the next load
     torch.cuda.empty_cache()
     hf = load(torch.float16)                                              # transformers' own float16 fix
     wo_dtypes = sorted({str(m.weight.dtype) for n, m in hf.named_modules() if n.endswith(".wo")})
