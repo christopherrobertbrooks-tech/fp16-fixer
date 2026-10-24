@@ -6,7 +6,9 @@ Calibrates on prompts.json's "calibration" prompts, writes plan.json, and checks
 ("held_out", plus an optional --extra file of private prompts that are only reported in aggregate): relative error
 and cosine vs float32 for plain float16 and float16 + plan.
 
-    make_plan.py --model WAN_DIR [--extra private_prompts.json] [--out-dir .]
+    make_plan.py --model WAN_DIR [--extra private_prompts.json] [--out-dir .] [--rescale-stream]
+The residual stream is kept in float32 (Plan(stream_float32=True)): rescaled in float16 it is no faster here and
+less precise (5.4% worst held out vs 1.0%; see README). --rescale-stream makes the rescaled plan instead.
 Run it in the environment that will use the plan: a plan names exact operations, and transformers versions differ.
 """
 import argparse, json, os, sys, time
@@ -20,6 +22,7 @@ from fp16fix.apply import Applied
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--model", required=True); ap.add_argument("--extra"); ap.add_argument("--out-dir", default=HERE)
+ap.add_argument("--rescale-stream", action="store_true")
 a = ap.parse_args()
 P = json.load(open(os.path.join(HERE, "prompts.json")))
 extra = json.load(open(a.extra)) if a.extra else []
@@ -49,7 +52,7 @@ with torch.no_grad():
         for p in P["calibration"]:
             embed(p)
     stock = {p: embed(p) for p in ref}
-    plan = Plan(r32, r16)
+    plan = Plan(r32, r16, stream_float32=not a.rescale_stream)
     save_fixes(plan.fixes, os.path.join(a.out_dir, "plan.json"))
     with Applied(te, plan.fixes):
         fixed = {p: embed(p) for p in ref}

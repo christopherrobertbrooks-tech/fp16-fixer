@@ -50,9 +50,13 @@ def pow2_at_least(x):
 
 
 class Plan:
-    def __init__(self, rec32, rec16=None, headroom=4.0):
+    def __init__(self, rec32, rec16=None, headroom=4.0, stream_float32=False):
+        """stream_float32=True keeps every residual stream in float32 even where it could be rescaled: slower in
+        principle, more precise where a stream holds huge values next to small ones (float16 loses small updates
+        added to a large value; umT5: 1.0% worst held out vs 5.4% rescaled, at the same speed)."""
         self.lim = FP16_MAX / headroom
         self.headroom = headroom
+        self.stream_float32 = stream_float32
         self.val = rec32.node_values()
         self.modout = {k[0]: v for k, v in rec32.values().items() if k[1] == "output"}   # module path -> output peak
         self.order = rec32.node_order
@@ -246,9 +250,10 @@ class Plan:
         non_norm = sorted({r[0] for r in readers if not self.is_norm(r)}) + (["the caller (returned)"] if returned else [])
         fix = {"rule": "residual stream", "nodes": sorted(comp, key=lambda c: self.order.get(c, 0)), "peak": peak,
                "peak_at": max(comp, key=self.v), "factor": factor}
-        if non_norm:
+        if non_norm or self.stream_float32:
             fix.update(rule="residual stream in float32",
-                       why=f"read by modules that aren't scale-free norms with an eps attribute: {non_norm[:4]}",
+                       why=f"read by modules that aren't scale-free norms with an eps attribute: {non_norm[:4]}" if non_norm
+                       else "kept in float32 by request (stream_float32=True)",
                        readers=sorted({r[0] for r in readers}),
                        readers_keep_float32=sorted({r[0] for r in readers if self.modout.get(r[0], 0.0) > FP16_MAX}),
                        first_value=sorted(w for w in writers if len(self.succs.get(w, ())) > 1 and self.v(w) > self.lim))

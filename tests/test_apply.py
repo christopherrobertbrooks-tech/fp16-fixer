@@ -71,3 +71,19 @@ def test_a_saved_plan_works_after_loading(tmp_path):
         with Applied(half, load_fixes(tmp_path / "plan.json")):
             out = half(x.half())
     assert torch.isfinite(out).all() and ((out.float() - ref).norm() / ref.norm()).item() < 2e-2
+
+
+def test_stream_float32_plan_in_float16():
+    torch.manual_seed(0)
+    model = Toy(stream_big=True).eval()
+    x = torch.randn(1, 32, 64)
+    with torch.no_grad():
+        with Recorder(model) as r32:
+            ref = model(x)
+        half = copy.deepcopy(model).half()
+        with Recorder(half) as r16:
+            half(x.half())
+        plan = Plan(r32, r16, stream_float32=True)
+        with Applied(half, plan.fixes):
+            out = half(x.half()).float()
+    assert torch.isfinite(out).all() and ((out - ref).norm() / ref.norm()).item() < 2e-2, plan.describe()

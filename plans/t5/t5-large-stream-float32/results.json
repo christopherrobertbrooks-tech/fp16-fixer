@@ -1,0 +1,345 @@
+{
+ "model": "t5-large",
+ "stream_float32": true,
+ "transformers": "5.18.0",
+ "torch": "2.8.0+cu126",
+ "gpu": "Tesla V100-PCIE-32GB",
+ "calibration_prompts": 20,
+ "hf_fp16_wo_dtype": [
+  "torch.float32"
+ ],
+ "held_out_summary": {
+  "plain_fp16": {
+   "n": 12,
+   "finite": 12,
+   "top1_mean": 0.9722222238779068,
+   "rel_err_median": 0.0068651167675852776,
+   "rel_err_max": 0.03565884009003639,
+   "same_output": 11
+  },
+  "plan_fp16": {
+   "n": 12,
+   "finite": 12,
+   "top1_mean": 1.0,
+   "rel_err_median": 0.0002495907829143107,
+   "rel_err_max": 0.00029396385070867836,
+   "same_output": 12
+  },
+  "hf_fp16": {
+   "n": 12,
+   "finite": 12,
+   "top1_mean": 1.0,
+   "rel_err_median": 0.00024310506705660373,
+   "rel_err_max": 0.0002823187387548387,
+   "same_output": 12
+  }
+ },
+ "time_s_held_out_teacher_forced": {
+  "fp32": 0.1840524673461914,
+  "plan_fp16": 0.6298809051513672,
+  "hf_fp16": 0.18888568878173828
+ },
+ "held_out": [
+  {
+   "prompt": "translate English to German: The train to Hamburg leaves from platform four.",
+   "fp32_output": "Der Zug nach Hamburg fährt von Bahnhof 4.",
+   "plain_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.014998963102698326,
+    "same_output": true,
+    "output": "Der Zug nach Hamburg fährt von Bahnhof 4."
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.00024253519950434566,
+    "same_output": true,
+    "output": "Der Zug nach Hamburg fährt von Bahnhof 4."
+   },
+   "hf_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.00024310506705660373,
+    "same_output": true,
+    "output": "Der Zug nach Hamburg fährt von Bahnhof 4."
+   }
+  },
+  {
+   "prompt": "translate English to French: We need more time to finish the project.",
+   "fp32_output": "Nous avons besoin de plus de temps pour terminer le projet.",
+   "plain_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0068651167675852776,
+    "same_output": true,
+    "output": "Nous avons besoin de plus de temps pour terminer le projet."
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.000228542136028409,
+    "same_output": true,
+    "output": "Nous avons besoin de plus de temps pour terminer le projet."
+   },
+   "hf_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.00022842353791929781,
+    "same_output": true,
+    "output": "Nous avons besoin de plus de temps pour terminer le projet."
+   }
+  },
+  {
+   "prompt": "translate English to Romanian: My sister lives in a small house near the sea.",
+   "fp32_output": "Sora mea locuieşte într-o casă mică lângă mare.",
+   "plain_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.019126253202557564,
+    "same_output": true,
+    "output": "Sora mea locuieşte într-o casă mică lângă mare."
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.00027032956131733954,
+    "same_output": true,
+    "output": "Sora mea locuieşte într-o casă mică lângă mare."
+   },
+   "hf_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.00027313799364492297,
+    "same_output": true,
+    "output": "Sora mea locuieşte într-o casă mică lângă mare."
+   }
+  },
+  {
+   "prompt": "summarize: Farmers in the region are reporting a record harvest this year after a mild spring and steady summer rain. Prices for wheat and corn are expected to fall as a result, which could lower costs for bakeries and food producers.",
+   "fp32_output": "farmers in the region are reporting a record harvest this year . prices for wheat and corn are expected to fall as a result .",
+   "plain_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0016122203087434173,
+    "same_output": true,
+    "output": "farmers in the region are reporting a record harvest this year . prices for wheat and corn are expected to fall as a result ."
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.00025534210726618767,
+    "same_output": true,
+    "output": "farmers in the region are reporting a record harvest this year . prices for wheat and corn are expected to fall as a result ."
+   },
+   "hf_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0002590215008240193,
+    "same_output": true,
+    "output": "farmers in the region are reporting a record harvest this year . prices for wheat and corn are expected to fall as a result ."
+   }
+  },
+  {
+   "prompt": "summarize: The football club announced that its stadium will be rebuilt, increasing capacity from 30,000 to 45,000 seats. Construction will begin next summer and take about three years.",
+   "fp32_output": "construction will begin next summer and take about three years . capacity will increase from 30,000 to 45,000 seats .",
+   "plain_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0021265647374093533,
+    "same_output": true,
+    "output": "construction will begin next summer and take about three years . capacity will increase from 30,000 to 45,000 seats ."
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0002510573831386864,
+    "same_output": true,
+    "output": "construction will begin next summer and take about three years . capacity will increase from 30,000 to 45,000 seats ."
+   },
+   "hf_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.00023004892864264548,
+    "same_output": true,
+    "output": "construction will begin next summer and take about three years . capacity will increase from 30,000 to 45,000 seats ."
+   }
+  },
+  {
+   "prompt": "cola sentence: Him and me went to the store yesterday.",
+   "fp32_output": "acceptable",
+   "plain_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0003208080888725817,
+    "same_output": true,
+    "output": "acceptable"
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0002159126743208617,
+    "same_output": true,
+    "output": "acceptable"
+   },
+   "hf_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.00025995983742177486,
+    "same_output": true,
+    "output": "acceptable"
+   }
+  },
+  {
+   "prompt": "stsb sentence1: A woman is slicing an onion. sentence2: Someone is cutting a vegetable.",
+   "fp32_output": "1.6",
+   "plain_fp16": {
+    "finite": true,
+    "top1": 0.6666666865348816,
+    "rel_err": 0.03565884009003639,
+    "same_output": false,
+    "output": "1.8"
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0002519654808565974,
+    "same_output": true,
+    "output": "1.6"
+   },
+   "hf_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0002209914819104597,
+    "same_output": true,
+    "output": "1.6"
+   }
+  },
+  {
+   "prompt": "question: How tall is the tower? context: The radio tower, finished in 1972, stands 368 metres tall and is the tallest structure in the country.",
+   "fp32_output": "368 metres tall",
+   "plain_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.00032489668228663504,
+    "same_output": true,
+    "output": "368 metres tall"
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0002495907829143107,
+    "same_output": true,
+    "output": "368 metres tall"
+   },
+   "hf_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0002823187387548387,
+    "same_output": true,
+    "output": "368 metres tall"
+   }
+  },
+  {
+   "prompt": "sst2 sentence: The acting was wooden and the plot made no sense.",
+   "fp32_output": "negative",
+   "plain_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0011878994992002845,
+    "same_output": true,
+    "output": "negative"
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.00021405520965345204,
+    "same_output": true,
+    "output": "negative"
+   },
+   "hf_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0002149880601791665,
+    "same_output": true,
+    "output": "negative"
+   }
+  },
+  {
+   "prompt": "mnli premise: All the tickets were sold within an hour. hypothesis: The event was popular.",
+   "fp32_output": "neutral",
+   "plain_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0025032940320670605,
+    "same_output": true,
+    "output": "neutral"
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0002075546362902969,
+    "same_output": true,
+    "output": "neutral"
+   },
+   "hf_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.0002054167416645214,
+    "same_output": true,
+    "output": "neutral"
+   }
+  },
+  {
+   "prompt": "translate English to German: Can you tell me where the nearest pharmacy is?",
+   "fp32_output": "Können Sie mir sagen, wo die nächste Apotheke ist?",
+   "plain_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.013035542331635952,
+    "same_output": true,
+    "output": "Können Sie mir sagen, wo die nächste Apotheke ist?"
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.00023176483227871358,
+    "same_output": true,
+    "output": "Können Sie mir sagen, wo die nächste Apotheke ist?"
+   },
+   "hf_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.00022978025663178414,
+    "same_output": true,
+    "output": "Können Sie mir sagen, wo die nächste Apotheke ist?"
+   }
+  },
+  {
+   "prompt": "question: What colour was the car? context: The police are looking for a blue car that was seen near the bank on Monday night.",
+   "fp32_output": "blue",
+   "plain_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.03050152212381363,
+    "same_output": true,
+    "output": "blue"
+   },
+   "plan_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.00029396385070867836,
+    "same_output": true,
+    "output": "blue"
+   },
+   "hf_fp16": {
+    "finite": true,
+    "top1": 1.0,
+    "rel_err": 0.00024571697576902807,
+    "same_output": true,
+    "output": "blue"
+   }
+  }
+ ],
+ "plan": "103 operations above 16,376 that run in float16 -> 12 fix(es) (\"margin only\" = the peak fits float16 already; the fix only buys the requested headroom)\n- residual stream (48 adds, peak 301,782): keep in float32 (kept in float32 by request (stream_float32=True))\n- residual stream (72 adds, peak 74,930): keep in float32 (kept in float32 by request (stream_float32=True))\n  [margin only]\n- float32 island: encoder.block.14.layer.1.DenseReluDense.wo (peak 38,241; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.15.layer.1.DenseReluDense.wo (peak 38,203; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.16.layer.1.DenseReluDense.wo (peak 35,241; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.17.layer.1.DenseReluDense.wo (peak 35,039; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.19.layer.1.DenseReluDense.wo (peak 28,828; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: encoder.block.20.layer.1.DenseReluDense.wo (peak 44,592; no proportional path back to a value that fits)\n- float32 island: encoder.block.21.layer.1.DenseReluDense.wo (peak 89,717; no proportional path back to a value that fits)\n- float32 island: encoder.block.22.layer.1.DenseReluDense.wo (peak 88,860; no proportional path back to a value that fits)\n- float32 island: encoder.block.23.layer.1.DenseReluDense.wo (peak 103,853; no proportional path back to a value that fits)\n  [margin only]\n- float32 island: decoder.block.23.layer.1.EncDecAttention.o (peak 23,094; no proportional path back to a value that fits)"
+}

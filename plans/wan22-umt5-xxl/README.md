@@ -34,5 +34,7 @@ rescales the stream (/ 32) in float16 instead (`remade-2026-10-23/`): exact in r
 prompts either way), and on the same 12 held-out prompts 0.29%
 median / **5.4% worst** (one prompt; the other eleven 0.18-0.61%). That prompt pushes no value past what calibration
 saw; the loss is float16's precision: the stream holds values up to ~374,000 next to small ones, and small updates
-added to a large value in float16 are lost. Keep this `plan.json` (float32 stream); it still applies and checks with
+added to a large value in float16 are lost. `make_plan.py` now asks for the float32 stream (`Plan(stream_float32=True)`; `--rescale-stream` for the other one) and
+remakes the shipped plan's shape: 0.19% median / 1.04% worst held out (`remade-2026-10-23/results-stream-float32.json`).
+Keep this `plan.json` (float32 stream); it still applies and checks with
 the current code (`check_shipped.py` -> `check_shipped.json`: 0.196% median / 1.02% worst, every planned place met).

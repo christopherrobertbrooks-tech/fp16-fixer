@@ -225,6 +225,9 @@ epsilon / 1024.** The RFC's proposal, with a power-of-two factor (peak 299,939 n
 
 Weights: Unsloth's ungated copy (`unsloth/gemma-3-4b-it`, the Gemma licence applies), text only.
 
+`Plan(r32, r16, stream_float32=True)` keeps residual streams in float32 even where they could be rescaled: more
+precise when a stream holds huge values next to small ones (umT5), but it needs the run-time hooks (no `bake`).
+
 A ready-made plan for Wan 2.2's umT5-XXL, calibrated and checked on held-out prompts:
 [plans/wan22-umt5-xxl](plans/wan22-umt5-xxl).
 
@@ -236,7 +239,7 @@ against the published fix. Tesla V100.
 | model | plain float16 | float16 + plan (held out) | published fix (held out) | plan |
 | --- | --- | --- | --- | --- |
 | Gemma 3 1B base | NaN 12/12 | logits 0.087% median, KL 6.9e-5 on WikiText, 10/12 greedy runs identical; decoding 2x slower than float32 (hooks) | RFC #37226: at its x 1/64 0.21%, KL 6.0e-4; **at the plan's x 1/8 about the same (0.090%, KL 8.1e-5)**, at float16 speed | [stream / 8](plans/gemma3-1b-pt) |
-| t5-large | clamped, no NaN: logits 0.69% / 3.6%, 11/12 outputs same | logits 0.039% / 0.049%, 12/12 same; 2.6x slower than float32 (hooks) | **transformers' wo-in-float32 + clamp: 0.024% / 0.028%, 12/12, float32 speed -- better than the plan** | [two streams / 32, / 8](plans/t5) |
+| t5-large | clamped, no NaN: logits 0.69% / 3.6%, 11/12 outputs same | logits 0.039% / 0.049%, 12/12 same; 2.6x slower than float32 (hooks); float32 streams: 0.025% / 0.029%, 3.3x slower | **transformers' wo-in-float32 + clamp: 0.024% / 0.028%, 12/12, float32 speed -- better than the plan** | [two streams / 32, / 8](plans/t5) |
 
 Not tried: MiniMax H3 itself (its smallest 16-bit setup is ~95 GB of weights, beyond a 32 GB V100 with 16 GB of RAM).
 
