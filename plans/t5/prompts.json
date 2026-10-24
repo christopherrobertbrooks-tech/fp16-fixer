@@ -1,0 +1,38 @@
+{
+ "calibration": [
+  "translate English to German: The weather is nice today, so we are going to the park.",
+  "translate English to French: Please send me the report before Friday afternoon.",
+  "translate English to Romanian: The museum opens at nine in the morning.",
+  "summarize: The city council voted on Tuesday to expand the bus network, adding six new routes that will connect the northern suburbs to the central station. Officials said the change will cost twelve million dollars over three years and should cut average commute times by fifteen minutes.",
+  "summarize: Researchers have found that regular walking can improve memory in older adults. In a study of 500 people over two years, those who walked thirty minutes a day scored higher on recall tests than those who did not.",
+  "cola sentence: The books was on the table.",
+  "cola sentence: She has finished her homework already.",
+  "stsb sentence1: A man is playing a guitar. sentence2: A person plays a musical instrument.",
+  "question: What is the capital of Canada? context: Canada is a country in North America. Its capital is Ottawa, and its largest city is Toronto.",
+  "question: When was the bridge built? context: The old stone bridge over the river was built in 1820 and restored in 1995.",
+  "translate English to German: I would like to book a table for two people at seven o'clock.",
+  "translate English to French: The children are playing football in the garden.",
+  "summarize: A storm brought heavy rain and strong winds to the coast overnight, knocking down trees and leaving thousands of homes without power. Repair crews expect to restore electricity to most areas by the evening.",
+  "sst2 sentence: This film was a complete waste of two hours.",
+  "sst2 sentence: An absolutely charming and heartfelt story.",
+  "mnli premise: The restaurant closes at ten. hypothesis: The restaurant is open at midnight.",
+  "translate English to German: Machine learning models need large amounts of data.",
+  "question: Who wrote the letter? context: The letter, written by Maria to her brother in 1943, was found in an attic last year.",
+  "rte sentence1: The company hired fifty new workers. sentence2: The company has new employees.",
+  "summarize: The new library has three floors, a cafe and a children's reading room. It replaces a building from the 1960s that was too small for the growing town."
+ ],
+ "held_out": [
+  "translate English to German: The train to Hamburg leaves from platform four.",
+  "translate English to French: We need more time to finish the project.",
+  "translate English to Romanian: My sister lives in a small house near the sea.",
+  "summarize: Farmers in the region are reporting a record harvest this year after a mild spring and steady summer rain. Prices for wheat and corn are expected to fall as a result, which could lower costs for bakeries and food producers.",
+  "summarize: The football club announced that its stadium will be rebuilt, increasing capacity from 30,000 to 45,000 seats. Construction will begin next summer and take about three years.",
+  "cola sentence: Him and me went to the store yesterday.",
+  "stsb sentence1: A woman is slicing an onion. sentence2: Someone is cutting a vegetable.",
+  "question: How tall is the tower? context: The radio tower, finished in 1972, stands 368 metres tall and is the tallest structure in the country.",
+  "sst2 sentence: The acting was wooden and the plot made no sense.",
+  "mnli premise: All the tickets were sold within an hour. hypothesis: The event was popular.",
+  "translate English to German: Can you tell me where the nearest pharmacy is?",
+  "question: What colour was the car? context: The police are looking for a blue car that was seen near the bank on Monday night."
+ ]
+}

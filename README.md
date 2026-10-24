@@ -195,7 +195,8 @@ against the published fix. Tesla V100.
 
 | model | plain float16 | float16 + plan (held out) | published fix (held out) | plan |
 | --- | --- | --- | --- | --- |
-| Gemma 3 1B base | NaN 12/12 | top-1 99.65%, logits 0.087% median / 0.12% worst, 10/12 greedy runs identical | RFC #37226 (x 1/64): 99.48%, 0.21% / 0.42%, 8/12 | [stream / 8](plans/gemma3-1b-pt) |
+| Gemma 3 1B base | NaN 12/12 | logits 0.087% median, KL 6.9e-5 on WikiText, 10/12 greedy runs identical; decoding 2x slower than float32 (hooks) | RFC #37226: at its x 1/64 0.21%, KL 6.0e-4; **at the plan's x 1/8 about the same (0.090%, KL 8.1e-5)**, at float16 speed | [stream / 8](plans/gemma3-1b-pt) |
+| t5-large | clamped, no NaN: logits 0.69% / 3.6%, 11/12 outputs same | logits 0.039% / 0.049%, 12/12 same; 2.6x slower than float32 (hooks) | **transformers' wo-in-float32 + clamp: 0.024% / 0.028%, 12/12, float32 speed -- better than the plan** | [two streams / 32, / 8](plans/t5) |
 
 Not tried: MiniMax H3 itself (its smallest 16-bit setup is ~95 GB of weights, beyond a 32 GB V100 with 16 GB of RAM).
 

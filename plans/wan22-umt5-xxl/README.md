@@ -26,3 +26,12 @@ with torch.no_grad(), Applied(te, load_fixes("plan.json")):
 ```
 
 Used by [wan-video-on-v100](https://github.com/christopherrobertbrooks-tech/wan-video-on-v100)'s `wan_clip.py --te-fp16-plan`.
+
+**Remaking the plan now gives a different, worse one (2026-10-23).** `plan.json` was made before a fix to
+`fp16fix/find.py`: T5 calls one dropout module on the embeddings and again on the encoder's output, and the planner
+used to merge the two, so it saw the stream as read by more than norms and kept it in float32. With the fix it
+rescales the stream (/ 32) in float16 instead: exact in range, faster, but on the same 12 held-out prompts 0.29%
+median / **5.4% worst** (one prompt; the other eleven 0.18-0.61%). That prompt pushes no value past what calibration
+saw; the loss is float16's precision: the stream holds values up to ~374,000 next to small ones, and small updates
+added to a large value in float16 are lost. Keep this `plan.json` (float32 stream); it still applies and checks with
+the current code (0.196% median / 1.02% worst, every planned place met).

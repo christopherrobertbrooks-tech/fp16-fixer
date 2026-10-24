@@ -14,7 +14,8 @@ Maxima are kept on the GPU (torch.maximum) and read once at the end, so recordin
 With graph=True (the default) it also keeps a data-flow map for the planner: every operation call is a node
 (module path, "op:<name>#<n>", n = its count of that op within one call of the module, so the two residual adds of a
 decoder layer are #0 and #1), with an edge from the node that produced each of its tensor inputs. Shape and dtype
-operations (view, transpose, to, cat, ...) pass their input's producer through. Plain numbers an operation multiplies
+operations (view, transpose, to, cat, ...) and ops that return their own input (dropout in eval) pass their input's
+producer through. Plain numbers an operation multiplies
 or divides by are kept too (node_scalars), so an attention scale after q @ k^T can be found. Tensors the model
 returns get an edge to the OUTPUT node, so the planner knows the caller reads them.
 """
@@ -214,7 +215,12 @@ class Recorder:
                 name = getattr(func, "__name__", str(func))
                 if not rec._stack or rec._busy:
                     return out
-                if name in _SKIP:
+                # an op that hands back its own input unchanged (dropout in eval) passes it through, like a reshape --
+                # else one dropout module used twice (T5Stack: on the embeddings and on the final output) merges two
+                # values into one node; in-place ops (x += y) also return their input, but change it
+                same = isinstance(out, torch.Tensor) and bool(args) and out is args[0] and not (
+                    name.endswith("_") or name.startswith("__i"))
+                if name in _SKIP or same:
                     if rec.graph:                     # shape / dtype ops: the output comes from the input's producer
                         src = next((rec._producer(a) for a in _tensors(args) if rec._producer(a) is not None), None)
                         if src is not None:

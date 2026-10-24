@@ -369,3 +369,23 @@ def test_attention_scale_not_moved_onto_q_when_q_is_also_returned():
     moves = [f for f in plan.fixes if f["rule"].startswith("move the attention scale")]
     assert all(n[0] != "q_norm" for f in moves for _, n in f["move_to"]), plan.describe()   # k's side is fine
     assert err <= EXACT, (err, plan.describe())
+
+
+# ---- one dropout module used on the way in and on the way out (T5Stack): in eval it returns its input -------------
+class SharedDropout(nn.Module):
+    """The stream toy with one nn.Dropout called on the embeddings and again on the final norm's output."""
+    def __init__(s):
+        super().__init__(); s.t = Toy(stream_big=True); s.drop = nn.Dropout(0.1); s.head = nn.Linear(64, 8, bias=False)
+
+    def forward(s, x):
+        h = s.drop(x * 1e5)
+        for l in s.t.layers:
+            h = l(h)
+        return s.head(s.drop(s.t.norm(h)))
+
+
+def test_dropout_called_twice_is_a_pass_through():
+    torch.manual_seed(0)
+    err, plan = exactness(SharedDropout().eval())
+    assert "residual stream" in [f["rule"] for f in plan.fixes], plan.describe()   # read only by norms
+    assert err <= EXACT, (err, plan.describe())
