@@ -1,0 +1,510 @@
+{
+ "control_fp32_vs_fp32_wave_corr": 0.9999998807907104,
+ "plan_vs_hand_wave_corr": NaN,
+ "first_step_rel_err": {
+  "fp16-stock": NaN,
+  "fp16-plan": 0.03532826527953148,
+  "fp16-hand": NaN,
+  "fp16-baked": 0.03654199838638306
+ },
+ "ckpt": "acestep-v15-turbo",
+ "steps": 8,
+ "cfg": 1.0,
+ "plan": "4 operations above 16,376 that run in float16 -> 2 fix(es) (\"margin only\" = the peak fits float16 already; the fix only buys the requested headroom)\n- residual stream (16 adds, peak 504,648 at encoder.lyric_encoder.layers.7): divide by 32 -> shrink at: output of encoder.lyric_encoder.embed_tokens (linear, 1x); output of encoder.lyric_encoder.layers.N.self_attn.o_proj (linear, 8x); output of encoder.lyric_encoder.layers.N.mlp.down_proj (linear, 7x); output of encoder.lyric_encoder.layers.N.mlp (mul, 1x); norms' eps / 1024: encoder.lyric_encoder.layers.N.input_layernorm, encoder.lyric_encoder.layers.N.post_attention_layernorm, encoder.lyric_encoder.norm\n  [margin only]\n- residual stream (72 adds, peak 27,114 at decoder.layers.23): divide by 2 -> shrink at: output of decoder.proj_in.N (conv1d, 1x); output of decoder.layers.N (mul, 24x); output of decoder.layers.N.cross_attn.o_proj (linear, 24x); output of decoder.layers.N.mlp.down_proj (linear, 1x); norms' eps / 4: decoder.layers.N.cross_attn_norm, decoder.layers.N.mlp_norm, decoder.layers.N.self_attn_norm, decoder.norm_out",
+ "fp32_s": 2.2002735137939453,
+ "plan_s": 1.1262662410736084,
+ "hand_s": NaN,
+ "fp32": {
+  "ok": true,
+  "rms": 0.13158485293388367,
+  "wave_corr": 0.9999998807907104,
+  "logmel_corr": 0.9999999403953552
+ },
+ "fp16_stock": {
+  "ok": false
+ },
+ "fp16_plan": {
+  "ok": true,
+  "rms": 0.12905505299568176,
+  "wave_corr": 0.9938341379165649,
+  "logmel_corr": 0.9968298673629761
+ },
+ "fp16_hand": {
+  "ok": false
+ },
+ "fp16_baked": {
+  "ok": true,
+  "rms": 0.12873193621635437,
+  "wave_corr": 0.9910209774971008,
+  "logmel_corr": 0.996548593044281
+ },
+ "baked_s": 1.0945544242858887,
+ "baked_vs_plan_wave_corr": 0.9983773827552795,
+ "bake": {
+  "baked": [
+   [
+    "module scalings",
+    "encoder.lyric_encoder.embed_tokens",
+    "x0.03125, weights (check 2.5e-04)"
+   ],
+   [
+    "module scalings",
+    "encoder.lyric_encoder.layers.0.self_attn.o_proj",
+    "x0.03125, weights (check 2.7e-04)"
+   ],
+   [
+    "module scalings",
+    "encoder.lyric_encoder.layers.0.mlp.down_proj",
+    "x0.03125, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "encoder.lyric_encoder.layers.1.self_attn.o_proj",
+    "x0.03125, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "encoder.lyric_encoder.layers.1.mlp.down_proj",
+    "x0.03125, weights (check 2.5e-04)"
+   ],
+   [
+    "module scalings",
+    "encoder.lyric_encoder.layers.2.self_attn.o_proj",
+    "x0.03125, weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "encoder.lyric_encoder.layers.2.mlp.down_proj",
+    "x0.03125, weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "encoder.lyric_encoder.layers.3.self_attn.o_proj",
+    "x0.03125, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "encoder.lyric_encoder.layers.3.mlp.down_proj",
+    "x0.03125, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "encoder.lyric_encoder.layers.4.self_attn.o_proj",
+    "x0.03125, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "encoder.lyric_encoder.layers.4.mlp.down_proj",
+    "x0.03125, weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "encoder.lyric_encoder.layers.5.self_attn.o_proj",
+    "x0.03125, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "encoder.lyric_encoder.layers.5.mlp.down_proj",
+    "x0.03125, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "encoder.lyric_encoder.layers.6.self_attn.o_proj",
+    "x0.03125, weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "encoder.lyric_encoder.layers.6.mlp.down_proj",
+    "x0.03125, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "encoder.lyric_encoder.layers.7.self_attn.o_proj",
+    "x0.03125, weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "encoder.lyric_encoder.layers.7.mlp.up_proj",
+    "x0.03125, weights (check 2.1e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.proj_in.1",
+    "x0.5, weights (check 3.3e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.0.self_attn.o_proj",
+    "x0.5, weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.0.cross_attn.o_proj",
+    "x0.5, weights (check 2.7e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.0.mlp.down_proj",
+    "x0.5, weights (check 2.7e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.1.self_attn.o_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.1.cross_attn.o_proj",
+    "x0.5, weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.1.mlp.down_proj",
+    "x0.5, weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.2.self_attn.o_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.2.cross_attn.o_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.2.mlp.down_proj",
+    "x0.5, weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.3.self_attn.o_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.3.cross_attn.o_proj",
+    "x0.5, weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.3.mlp.down_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.4.self_attn.o_proj",
+    "x0.5, weights (check 3.1e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.4.cross_attn.o_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.4.mlp.down_proj",
+    "x0.5, weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.5.self_attn.o_proj",
+    "x0.5, weights (check 3.1e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.5.cross_attn.o_proj",
+    "x0.5, weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.5.mlp.down_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.6.self_attn.o_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.6.cross_attn.o_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.6.mlp.down_proj",
+    "x0.5, weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.7.self_attn.o_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.7.cross_attn.o_proj",
+    "x0.5, weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.7.mlp.down_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.8.self_attn.o_proj",
+    "x0.5, weights (check 3.1e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.8.cross_attn.o_proj",
+    "x0.5, weights (check 2.7e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.8.mlp.down_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.9.self_attn.o_proj",
+    "x0.5, weights (check 3.2e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.9.cross_attn.o_proj",
+    "x0.5, weights (check 2.5e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.9.mlp.down_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.10.self_attn.o_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.10.cross_attn.o_proj",
+    "x0.5, weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.10.mlp.down_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.11.self_attn.o_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.11.cross_attn.o_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.11.mlp.down_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.12.self_attn.o_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.12.cross_attn.o_proj",
+    "x0.5, weights (check 2.7e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.12.mlp.down_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.13.self_attn.o_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.13.cross_attn.o_proj",
+    "x0.5, weights (check 2.7e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.13.mlp.down_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.14.self_attn.o_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.14.cross_attn.o_proj",
+    "x0.5, weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.14.mlp.down_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.15.self_attn.o_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.15.cross_attn.o_proj",
+    "x0.5, weights (check 2.5e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.15.mlp.down_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.16.self_attn.o_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.16.cross_attn.o_proj",
+    "x0.5, weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.16.mlp.down_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.17.self_attn.o_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.17.cross_attn.o_proj",
+    "x0.5, weights (check 2.3e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.17.mlp.down_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.18.self_attn.o_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.18.cross_attn.o_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.18.mlp.down_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.19.self_attn.o_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.19.cross_attn.o_proj",
+    "x0.5, weights (check 2.7e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.19.mlp.down_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.20.self_attn.o_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.20.cross_attn.o_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.20.mlp.down_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.21.self_attn.o_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.21.cross_attn.o_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.21.mlp.down_proj",
+    "x0.5, weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.22.self_attn.o_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.22.cross_attn.o_proj",
+    "x0.5, weights (check 3.3e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.22.mlp.down_proj",
+    "x0.5, weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.23.self_attn.o_proj",
+    "x0.5, weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.23.cross_attn.o_proj",
+    "x0.5, weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "decoder.layers.23.mlp.down_proj",
+    "x0.5, weights (check 2.6e-04)"
+   ],
+   [
+    "eps",
+    "17 norms",
+    "/ 1024"
+   ],
+   [
+    "eps",
+    "73 norms",
+    "/ 4"
+   ]
+  ],
+  "leftover_rules": [],
+  "check": 0.038976773619651794,
+  "describe": "baked: 90 module scalings, 2 eps; end-to-end check vs Applied 3.9e-02"
+ }
+}

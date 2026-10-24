@@ -37,8 +37,9 @@ Perplexity can't tell them apart (all within 0.01 of float32); KL can. At the sa
 (it also divides the pre-norms' epsilon), which is small. What the planner adds is finding the fix, and its factor,
 from the measurements without knowing the model. What it costs: its Python hooks make decoding ~2x slower than
 float32 (0.54 s -> 1.15 s), while the RFC's weight edit runs at float16 speed (no faster than float32 on a 1B model,
-whose decoding is launch-bound). Baking the plan's rescale into the weights would remove that cost
-([#16](https://github.com/christopherrobertbrooks-tech/fp16-fixer/issues/16)).
+whose decoding is launch-bound). `fp16fix.bake`
+([#16](https://github.com/christopherrobertbrooks-tech/fp16-fixer/issues/16)) now writes this plan into the weights completely:
+82 tokens/s decoding (plain float16 speed), 0.088% median logits error (`results/bake-gemma3-1b.json`).
 
 ```python
 from fp16fix import load_fixes, Applied

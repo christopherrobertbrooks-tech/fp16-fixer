@@ -1,0 +1,398 @@
+{
+ "model": "gemma-3-4b-it",
+ "transformers": "5.18.0",
+ "torch": "2.8.0+cu126",
+ "gpu": "Tesla V100-PCIE-32GB",
+ "reps": 5,
+ "time_s": {
+  "fp32": {
+   "teacher_forced": 0.7626180648803711,
+   "decode_48": 1.306781530380249
+  },
+  "plain_fp16": {
+   "teacher_forced": 0.4556434154510498,
+   "decode_48": 1.077012062072754
+  },
+  "fp16_applied": {
+   "teacher_forced": 0.514214277267456,
+   "decode_48": 1.560236930847168
+  },
+  "fp16_baked": {
+   "teacher_forced": 0.4577200412750244,
+   "decode_48": 1.0750417709350586
+  }
+ },
+ "bake_s": 0.4265172481536865,
+ "fp16_applied": {
+  "finite": true,
+  "top1": 1.0,
+  "rel_err_median": 0.0012577108573168516,
+  "rel_err_max": 0.0018213512375950813,
+  "greedy_48_identical": 12
+ },
+ "fp16_baked": {
+  "finite": true,
+  "top1": 0.9982638905445734,
+  "rel_err_median": 0.0020739701576530933,
+  "rel_err_max": 0.0029696000274270773,
+  "greedy_48_identical": 11
+ },
+ "baked_vs_applied_rel_diff_max": 0.003151564858853817,
+ "bake": {
+  "baked": [
+   [
+    "module scalings",
+    "model.language_model.embed_tokens",
+    "x0.03125, buffers (check 2.1e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.0.post_attention_layernorm",
+    "x0.03125, offset weights (check 4.8e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.0.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 1.8e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.1.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.0e-03)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.1.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 1.0e-03)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.2.post_attention_layernorm",
+    "x0.03125, offset weights (check 9.4e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.2.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 4.1e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.3.post_attention_layernorm",
+    "x0.03125, offset weights (check 1.2e-03)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.3.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 5.7e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.4.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.4.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.5.post_attention_layernorm",
+    "x0.03125, offset weights (check 3.1e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.5.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 1.3e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.6.post_attention_layernorm",
+    "x0.03125, offset weights (check 4.1e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.6.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.1e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.7.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.7e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.7.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 1.8e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.8.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.5e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.8.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 1.7e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.9.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.5e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.9.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 1.3e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.10.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.4e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.10.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.1e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.11.post_attention_layernorm",
+    "x0.03125, offset weights (check 3.1e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.11.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.0e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.12.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.6e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.12.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 1.8e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.13.post_attention_layernorm",
+    "x0.03125, offset weights (check 3.1e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.13.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 1.4e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.14.post_attention_layernorm",
+    "x0.03125, offset weights (check 3.3e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.14.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 1.6e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.15.post_attention_layernorm",
+    "x0.03125, offset weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.15.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.7e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.16.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.16.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.5e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.17.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.9e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.17.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.4e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.18.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.1e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.18.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 3.0e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.19.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.8e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.19.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.6e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.20.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.4e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.20.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.1e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.21.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.2e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.21.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.3e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.22.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.3e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.22.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.3e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.23.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.5e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.23.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.1e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.24.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.4e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.24.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.1e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.25.post_attention_layernorm",
+    "x0.03125, offset weights (check 1.8e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.25.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.1e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.26.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.0e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.26.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.3e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.27.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.4e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.27.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.0e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.28.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.3e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.28.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.1e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.29.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.3e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.29.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.1e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.30.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.5e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.30.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.0e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.31.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.2e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.31.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 1.4e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.32.post_attention_layernorm",
+    "x0.03125, offset weights (check 2.2e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.32.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.1e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.33.post_attention_layernorm",
+    "x0.03125, offset weights (check 1.6e-04)"
+   ],
+   [
+    "module scalings",
+    "model.language_model.layers.33.post_feedforward_layernorm",
+    "x0.03125, offset weights (check 2.1e-04)"
+   ],
+   [
+    "eps",
+    "69 norms",
+    "/ 1024"
+   ]
+  ],
+  "leftover_rules": [],
+  "island_hooks": 0,
+  "describe": "baked: 69 module scalings, 1 eps"
+ }
+}

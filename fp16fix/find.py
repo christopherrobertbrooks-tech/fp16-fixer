@@ -107,6 +107,7 @@ class Recorder:
         self.biased = set()               # linear-op nodes called with a bias (not proportional in their input)
         self.repeated = set()             # nodes with one producer's tensor in two arguments (x * x)
         self.scale_free = {}              # module path -> eps attribute name, for scale-free norms (scale_free_eps)
+        self.module_out = {}              # module path -> the node that produced its (first) output tensor
         self._prod = {}                   # id(tensor) -> (weakref, node): who produced a live tensor
 
     # ---- recording -------------------------------------------------------------------------------------------
@@ -190,6 +191,9 @@ class Recorder:
     def _post(self, path):
         def f(mod, args, out):
             self._rec(path, "output", _first_tensor(out))
+            ft = _first_tensor(out)
+            if self.graph and isinstance(ft, torch.Tensor) and path not in self.module_out:
+                self.module_out[path] = self._producer(ft)
             if path == "<root>" and self.graph:        # what the model returns is read by its caller
                 for t in _tensors(out if not hasattr(out, "to_tuple") else out.to_tuple()):
                     src = self._producer(t)
