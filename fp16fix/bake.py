@@ -324,7 +324,9 @@ def bake(model, fixes, run, tol=None):
             else:
                 got = _first_tensor(run(model))
         rep.check = _rel(got, want) if torch.isfinite(got).all() else math.inf
-        limit = 1e-4 if dtype == torch.float32 else 5e-2
+        # float16 rounds differently with edited weights than with a run-time multiply; a noisy model (ACE-Step turbo's
+        # first denoising step: 3.5% from float32 either way) differs by a few percent. A leak is a factor 2^k: >= 50%.
+        limit = 1e-4 if dtype == torch.float32 else 0.1
         if not rep.check <= limit:
             raise ValueError(f"bake's end-to-end check failed: baked vs Applied differ by {rep.check:.3g} (> {limit:g}) "
                              "on the example run; the model was edited -- reload it")

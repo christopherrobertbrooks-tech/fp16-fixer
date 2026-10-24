@@ -148,7 +148,46 @@ song comparisons was invalid: ACE-Step's `GenerationConfig` defaults to `use_ran
 fixes alike (rounding grows through the sampler); the first step and the log-mel correlation say the two are equally
 close to float32.
 
-## An unseen model: Wan 2.2's umT5-XXL text encoder (`drivers/check_umt5.py`)
+## Step 5: bake (`fp16fix/bake.py`)
+
+`Applied` runs every operation through a Python `TorchFunctionMode`, which slows token-by-token decoding.
+`bake(model, plan.fixes, run)` writes the plan into the weights once instead, then the model runs as plain float16:
+
+```python
+from fp16fix import bake, load_fixes, Applied
+report = bake(model, load_fixes("plan.json", model=model), run=lambda m: m(input_ids=example_ids))
+print(report.describe())                  # what was baked; report.leftover: what still needs Applied (often nothing)
+```
+
+Each fix becomes a module edit: a module's output scaled -> its weights (or, for norms storing `1 + w`, the offset
+weights; for a scale kept as a buffer, the buffer); the norms' epsilon set; a moved attention scale -> `q_norm`'s
+weights and the attention's `scaling` set to 1; a float32 island -> that module converted to float32 behind two
+module hooks. Every edit is checked on the module's own inputs against a float32 copy, weights tied to another
+module (an output layer sharing the embedding) are left alone, and a final check against `Applied` on the example run
+refuses the result if anything leaked. What can't be baked comes back as `report.leftover`, a smaller plan for
+`Applied`.
+
+Tesla V100, everything baked (no leftover) on all four (`drivers/check_bake_lm.py`, `drivers/check_dit.py` with
+`FP16FIX_BAKE=1`; `results/bake-*.json`):
+
+| | float32 | float16 + `Applied` | float16 baked | plain float16 |
+| --- | ---: | ---: | ---: | ---: |
+| Gemma 3 1B, 48-token decode | 89 tokens/s | 42 tokens/s | **82 tokens/s** | 82 tokens/s (NaN) |
+| Gemma 3 1B, held-out logits error (median / worst) | -- | 0.087% / 0.12% | 0.088% / 0.17% | NaN |
+| Gemma 3 4B, 48-token decode | 37 tokens/s | 31 tokens/s | **45 tokens/s** | 45 tokens/s (NaN) |
+| Gemma 3 4B, held-out logits error (median / worst) | -- | 0.13% / 0.18% | 0.21% / 0.30% | NaN |
+| ACE-Step xl-sft, first denoising step vs float32 | -- | 0.349% | 0.347% | NaN |
+| ACE-Step xl-sft, 30 s song (50 steps, CFG 7) | 30.1 s | 9.7 s | 9.6 s | NaN |
+| ACE-Step turbo, first denoising step vs float32 | -- | 3.53% | 3.65% | NaN |
+
+Baking brings decoding to plain float16 speed (on a 1B model that is still a little slower than float32: its decoding
+is launch-bound). It costs a little precision where weights are stored as an offset: Gemma's post-norms `(1 + w)`
+become `(1 + w) / 32 - 1`, rounded to float16 (4B: 0.21% vs 0.13%; 11 of 12 greedy continuations identical, vs 12).
+The songs: the first step matches; over 50 CFG steps the baked and hooked songs drift apart like any two float16
+roundings do (waveform correlation with float32 0.825 baked, 0.863 hooks, 0.816 for the hand fixes; log-mel 0.985 /
+0.988 / 0.986).
+
+ (`drivers/check_umt5.py`)
 
 Studio-style encoding (padded to 512), 6 video prompts + Wan's default negative prompt, V100, calibration inputs
 (held out: [plans/wan22-umt5-xxl](plans/wan22-umt5-xxl)). In float16 transformers clamps over-range values to
@@ -202,8 +241,8 @@ against the published fix. Tesla V100.
 Not tried: MiniMax H3 itself (its smallest 16-bit setup is ~95 GB of weights, beyond a 32 GB V100 with 16 GB of RAM).
 
 Limits: tried on three model families (ACE-Step 1.5 + its Qwen3-based LMs, umT5, Gemma 3); the hooks run every operation through a
-Python `TorchFunctionMode` (no measurable cost on these diffusion runs; not yet measured on token-by-token LLM
-decoding); a plan is made per model from one calibration set (the 8 example songs, 3 prompts).
+Python `TorchFunctionMode` (no measurable cost on these diffusion runs; on token-by-token LLM decoding it costs
+~2x at 1B and ~1.4x at 4B -- `bake` removes it); a plan is made per model from one calibration set (the 8 example songs, 3 prompts).
 
 ## Tests
 
