@@ -12,7 +12,8 @@ writes plan.json, then on the "held_out" prompts compares with float32:
 Teacher-forced (the float32 output fed to the decoder: top-1 agreement, logits relative error) and free-running
 (greedy, up to 64 tokens: does the output equal float32's). Timings: median of 5 runs after a warm-up.
 
-    make_plan.py --model T5_DIR --out-dir DIR
+    make_plan.py --model T5_DIR --out-dir DIR [--stream-float32]
+--stream-float32 keeps the residual streams in float32 (Plan(stream_float32=True)) instead of rescaling them.
 """
 import argparse, json, os, sys, time
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, os.path.join(HERE, "..", ".."))
@@ -24,6 +25,7 @@ from fp16fix import Recorder, Plan, Applied, save_fixes
 NEW = 64
 ap = argparse.ArgumentParser()
 ap.add_argument("--model", required=True); ap.add_argument("--out-dir", required=True)
+ap.add_argument("--stream-float32", action="store_true")
 a = ap.parse_args()
 os.makedirs(a.out_dir, exist_ok=True)
 P = json.load(open(os.path.join(HERE, "prompts.json")))
@@ -61,7 +63,7 @@ with torch.no_grad():
     model.half()
     with Recorder(model) as r16:
         logits(model, cal)
-    plan = Plan(r32, r16)
+    plan = Plan(r32, r16, stream_float32=a.stream_float32)
     save_fixes(plan.fixes, os.path.join(a.out_dir, "plan.json"), model=model)
     res_out = {"plain_fp16": logits(model, held)}
     gen = {"plain_fp16": [greedy(model, x) for x, _ in held]}
@@ -101,7 +103,7 @@ def agg(k):
             "same_output": sum(r[k]["same_output"] for r in rows)}
 
 
-res = {"model": os.path.basename(a.model.rstrip("/")), "transformers": transformers.__version__, "torch": torch.__version__,
+res = {"model": os.path.basename(a.model.rstrip("/")), "stream_float32": a.stream_float32, "transformers": transformers.__version__, "torch": torch.__version__,
        "gpu": torch.cuda.get_device_name(), "calibration_prompts": len(cal), "hf_fp16_wo_dtype": wo_dtypes,
        "held_out_summary": {k: agg(k) for k in KINDS},
        "time_s_held_out_teacher_forced": {"fp32": t32, "plan_fp16": t_plan, "hf_fp16": t_hf},

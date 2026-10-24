@@ -76,3 +76,17 @@ def test_stream_read_by_a_non_norm_stays_in_float32():
     p = plan_of(Direct().eval())
     rules = [f["rule"] for f in p.fixes]
     assert "residual stream in float32" in rules and "residual stream" not in rules, p.describe()
+
+
+def test_stream_float32_option_keeps_a_rescalable_stream_in_float32():
+    """Plan(..., stream_float32=True): a stream that could be rescaled is kept in float32 instead (more precise
+    where the stream holds huge values next to small ones, e.g. umT5)."""
+    torch.manual_seed(0)
+    model = Toy(stream_big=True).eval()
+    torch.manual_seed(0)
+    x = torch.randn(1, 32, 64)
+    with torch.no_grad(), Recorder(model) as rec:
+        model(x)
+    assert "residual stream" in [f["rule"] for f in Plan(rec).fixes]
+    rules = [f["rule"] for f in Plan(rec, stream_float32=True).fixes]
+    assert "residual stream in float32" in rules and "residual stream" not in rules, rules

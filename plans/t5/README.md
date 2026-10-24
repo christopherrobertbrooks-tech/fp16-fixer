@@ -22,8 +22,10 @@ No float32 islands.
 | plain float16 (clamped) | 97.2% | 0.69% / 3.6% | 11 / 12 | -- |
 | float16 + transformers' fix | 100% | **0.024% / 0.028%** | 12 / 12 | 0.19 s |
 | float16 + plan | 100% | 0.039% / 0.049% | 12 / 12 | **0.48 s** |
+| float16 + plan, streams kept in float32 (`--stream-float32`) | 100% | 0.025% / 0.029% | 12 / 12 | 0.63 s |
 
-**transformers' fix is better here**: closer to float32 (its `wo` runs in float32) and no slower than float32, while
-the plan's hooks make it 2.6x slower. t5-large is only mildly broken in float16 (one held-out output changes: an
+**transformers' fix is better here**: as close to float32 as the plan with float32 streams, closer than the rescaled
+plan, and no slower than float32, while the plan's hooks make it 2.6-3.3x slower. `fp16fix.bake` can write the
+rescaled plan into the weights, but not a float32 stream (its adds need the run-time hooks). t5-large is only mildly broken in float16 (one held-out output changes: an
 STS-B score 1.6 -> 1.8). An earlier version of the planner kept the encoder stream in float32 with 20 islands
 (0.008% / 0.017%, 3.6x slower); that came from a dropout module T5 calls twice, fixed in `fp16fix/find.py`.
